@@ -1,0 +1,78 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double em, ep, h, k, s, x, x1, x2, xe, xo, xu, y, y1, y2, ym, yu
+Global Int32 a$, m!, pol!, v : s = 0.013 : ep = 10 ^ 2 : em = 10 ^ -16
+Print
+Print "       Numerische Berechnung lokaler Extrema von Funktionen y=f(x)"
+Print "                      ohne Verwendung von Ableitungen"
+Print "       ************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits ins Programm eingegeben?"
+Input " Durch Eintippen eines 'j' oder 'n' bejahen oder verneinen Sie diese Frage!  ", a$
+Print
+If a$ <> "j" And a$ <> "ja"
+  Print " Bitte beenden Sie den Programmablauf jetzt durch Schießen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu untersuchende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub funktion' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Mit welchem Wert der Variablen x soll die Nullstellensuche starten? ", x
+Input " Bei welchem Wert der Variablen x soll die Nullstellensuche enden  ? ", xe
+Print : Print " Ergebnis:"
+k = (3 - Sqr(5)) / 2            'Teilungsfaktor nach dem Goldenen Schnitt
+Do
+  FUNKTION : yu = y : Add x, s : FUNKTION : ym = y : Add x, s : FUNKTION
+  While Sgn(ym - yu) = Sgn(y - ym)
+    If x > xe
+      If m! = False Then Print " Kein lokales Extremum innerhalb des Intervalls gefunden!"
+      Print
+      Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    yu = ym : ym = y : Add x, s : FUNKTION
+  Wend
+  v = Sgn(ym - y) : xu = x - 2 * s : xo = x : h = 2 * s * k : x = xu + h
+  FUNKTION : If v = 1 Then Mul y, (-1)
+  x1 = x : y1 = y : x = xo - h : FUNKTION
+  If v = 1 Then Mul y, (-1)
+  x2 = x : y2 = y
+  While Abs(y1 - y2) > em And pol! = False
+    If y1 > y2
+      y1 = y2 : xu = x1 : x1 = x2 : x = xo - k * (xo - xu) : FUNKTION
+      If v = 1 Then Mul y, (-1)
+      If Abs(y) > ep Then pol! = True        'Erkennung von Polstellen
+      x2 = x : y2 = y
+    Else
+      y2 = y1 : xo = x2 : x2 = x1 : x = xu + k * (xo - xu) : FUNKTION
+      If v = 1 Then Mul y, (-1)
+'##E#
+      If Abs(y) > ep Then pol! = True        'Erkennung von Polstellen
+      x1 = x : y1 = y
+    EndIf
+  Wend
+  If Not pol!
+    m! = True : x = 0.5 * (xu + xo) : FUNKTION
+    If v = 1
+      Print " Maximum bei   x= "; Round(x, 5)
+      Print "               y= "; Round(y, 5)
+    Else
+      Print " Minimum bei   x= "; Round(x, 5)
+      Print "               y= "; Round(y, 5)
+    EndIf
+  EndIf
+  Add x, s : v = 0 : pol! = False
+Loop
+Sub FUNKTION              'In diese Subroutine y=f(x) eingeben!
+  Rem y = ((3 * x ^ 2 - 2 * x - 6) * (x ^ 2 - 1) - 6 * x * (x ^ 3 - x ^ 2 - 6 * x)) / (x ^ 2 - 1) ^ 4
+  Rem y = 1 / x + x
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) + 6
+  Rem y = Abs(x ^ 2 * Abs(x - 1) - 1) - 1
+  Rem y = Abs(x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24) + 1
+  Rem y = (Cos(x) - 1) ^ 3
+  Rem y = Abs(Tan(x) - x) - 1
+  Rem y = 50 / 1.25 / Sin(PI - Atan(50 / x) - Asin(1 / 1.25 * Sin(Atan(50 / x)))) + (120 - x) / 6
+  Rem y = Asin(1 * Sin(x) / Sqr(1 ^ 2 + 1.25 ^ 2 - 2 * 1 * 1.25 * Cos(x)))
+  Rem y = 1 / x
+  Rem y = 1 / (x + 2) + 1 / (x + 1) + 1 / x + 1 / (x - 1) + 1 / (x - 2) + 1 / (x - 3) - 4
+  y = x * (1 + Sqr((10 / (x - 10)) ^ 2 + 1))
+Return

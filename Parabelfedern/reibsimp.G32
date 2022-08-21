@@ -1,0 +1,73 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double dl, dphi, ds, dwb, dx, hp, kphi, ks, kwb, ls, wphi, ws, wwb
+Dim fs(2), fwb(2), fphi(2), h(25), sk(3), wbk(3), phik(3), x(25) As Double
+Global i%, j%, jm%, k%, t%
+Print
+Print " Programm zur Berechnung der Faktoren Ks, Kwb und Kphi nach Gleichung(4), (9) und (12)"
+Print "           für einzelne Blätter von 1200mm langen symmetrischen Parabelfedern"
+Print "                 mit gegebenen Dickenmaßen im Teilungsabstand von 25mm"
+Print "                      Programmiersprache: GFA-BASIC-32 für Windows"
+Print " *************************************************************************************"
+Print " Achtung: Alle benötigten Maße sind in Millimeter einzugeben!"
+Print
+ls = 600           'ls=Länge eines Armes der gestreckten Feder in mm
+dx = 25            'dx=kostanter Teilungsabstand der Blattdickenmaße in mm
+jm% = ls / dx
+Input " Welche Parabeldicke hp besitzt das betrachtete Federblatt ? ", hp
+Print
+Print " Wie groß sind die effektiven Dickenmaße h des Federblattes an den"
+Print " nachfolgend abgefragten Stellen im Abstand x von der Blattmitte ?"
+For j% = 0 To jm%                'Einlesen des Blattdickenverlaufs
+  x(j%) = j% * dx                'x=Abstand von der Blattmitte in mm
+  Print " x = "; x(j%)
+  Locate 12, CrsLin - 1
+  Input " h(x) = ";h(j%)       'h(x)=wahre Blattdicke an der Stelle x in mm
+Next j%
+t% = 4
+For i% = 1 To 3
+  dl = dx * t%
+  j% = 0
+'##E#
+  k% = 0
+  faktoren
+  Repeat
+    For k% = 1 To 2
+      Add j%, t%
+      faktoren
+    Next k%
+    Add ws, dl * (fs(0) + 4 * fs(1) + fs(2))                'Simpson-Formel
+    Add wwb, dl * (fwb(0) + 4 * fwb(1) + fwb(2))
+    Add wphi, dl * (fphi(0) + 4 * fphi(1) + fphi(2))
+    fs(0) = fs(2)
+    fwb(0) = fwb(2)
+    fphi(0) = fphi(2)
+  Until j% = jm%
+  sk(i%) = ws / (3 * ls)
+  wbk(i%) = wwb / (3 * ls)
+  phik(i%) = wphi / (3 * ls)
+  Clr ws, wwb, wphi
+  Div t%, 2
+Next i%
+ds = sk(2) - sk(1)                                  'Start der Extrapolation
+If ds == 0 Then ks = sk(1) Else ks = sk(1) + ds ^ 2 / (ds + sk(2) - sk(3))
+dwb = wbk(2) - wbk(1)
+If dwb == 0 Then kwb = wbk(1) Else kwb = wbk(1) + dwb ^ 2 / (dwb + wbk(2) - wbk(3))
+dphi = phik(2) - phik(1)
+If dphi == 0 Then kphi = phik(1) Else kphi = phik(1) + dphi ^ 2 / (dphi + phik(2) - phik(3))
+Print
+Print " Berechnungsergebnisse:"
+Print " Ks   ="; Round(ks, 4)
+Print " Kwb  ="; Round(kwb, 4)
+Print " Kphi ="; Round(kphi, 4)
+Print
+Print " ENDE (Durch Schließen dieses Fensters wird die Anwendung beendet!)"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+Sub faktoren
+  If h(j%) = 0
+    h(j%) = 10 ^ (-10)
+  EndIf
+  fs(k%) = (1 - x(j%) / ls) ^ 2 / (h(j%) / hp) ^ 3          'Integrand von Gl.(4)
+  fwb(k%) = (1 - x(j%) / ls) / (h(j%) / hp) ^ 2             'Integrand von Gl.(9)
+  fphi(k%) = (1 - x(j%) / ls) / (h(j%) / hp) ^ 3            'Integrand von Gl.(12)
+Return

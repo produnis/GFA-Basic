@@ -1,0 +1,202 @@
+'##B#
+INIT                                    //Diese Form des Starts ist mein spezieller Stiefel
+Do : Sleep : Until Me Is Nothing
+
+Sub INIT
+  Mode StrSpace 0
+'##B#
+  //in GB32 müssen alle Variablen deklariert werden!
+  Global Int m, s$                                              'allgemeine Variable
+  Global Int i, j, k, n, p, r, t, u, v, z                       'Ganzzahl-Variable
+  Global Double xa, xe, h, h0, x, x0, y0, y1, y2, y3, e         'Rechenwerte
+
+
+  Form F0 = "DG", , , _X, _Y : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+
+  Print
+  Print "     Lösung von Anfangswertaufgaben gewöhnlicher Differentialgleichungen"
+  Print "     bis 4. Ordnung nach dem Eulerverfahren mit Richardson-Extrapolation"
+  Print "     *******************************************************************"
+
+  m = MsgBox("Wurde die zu lösende DG bereits in das Pogramm eingegeben?", $44, "FRAGE") 'ja = 6 = IDYES, nein = 7 = IDNO
+
+  If m = IDNO
+'##B#
+    Print "hier Hilfetext einfügen"
+  Else
+
+'##B#
+    //Hier habe ich einiges in anderer Form gemacht:
+
+    Do
+      Do
+        Beep : Prompt "EINGABE", "Von welcher Ordnung ist diese D.-Gleichung?"#10#10"(1 <= n <= 4)", s$
+      Until s$          'Abbruch wird ignoriert. Es muß etwas eingegeben werden
+      n = Val(s$)
+      If n > 4 Or n < 1 Then Message"Die eingegebene Ordnungszahl war falsch!"
+    Until n < 5 And n > 0
+
+    Do
+      Prompt "EINGABE", #10#10"Mit welchem Wert von x soll die Berechnung starten?", s$
+      If s$ Then xa = Val(s$) Else Beep
+    Until s$
+
+    Do
+      Prompt "EINGABE", #10#10"Bei welchem Wert von x soll die Berechnung enden?", s$
+      If s$ Then xe = Val(s$) Else Beep
+    Until s$
+
+    Do
+      Prompt "EINGABE", #10#10"Mit welchem Delta-x soll bezüglich der Ausgabe"#10"der Funktionswerte fortgeschritten werden?", s$
+      If s$ Then h0 = Val(s$) Else Beep
+    Until s$
+    '---
+
+    If n = 1
+'##B#
+      'TEXT
+    ElseIf n = 2
+'##B#
+      'TEXT
+    Else
+'##B#
+      'TEXT
+    EndIf
+
+    '---
+    '#### Seite 2
+    '---
+
+    r = 20 : e = 10 ^ - 14
+    Global Double a(4, r), y(4), ys(4)
+
+    Do
+      Prompt "EINGABE", #10#10"Welchen Anfangswert hat die Stammfunktion y0 ?", s$
+      If s$ Then y(0) = Val(s$) : a(0, 1) = y(0) : ys(0) = y(0)  Else Beep
+    Until s$
+
+    If n = 2
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die erste Ableitung y1 ?", s$
+        If s$ Then y(1) = Val(s$) : a(1, 1) = y(1) : ys(1) = y(1)  Else Beep
+      Until s$
+    ElseIf n = 3
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die erste Ableitung y1 ?", s$
+        If s$ Then y(1) = Val(s$) : a(1, 1) = y(1) : ys(1) = y(1)  Else Beep
+      Until s$
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die zweite Ableitung y2 ?", s$
+        If s$ Then y(2) = Val(s$) : a(2, 1) = y(2) : ys(2) = y(2)  Else Beep
+      Until s$
+    Else If n = 4
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die erste Ableitung y1 ?", s$
+        If s$ Then y(1) = Val(s$) : a(1, 1) = y(1) : ys(1) = y(1)  Else Beep
+      Until s$
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die zweite Ableitung y2 ?", s$
+        If s$ Then y(2) = Val(s$) : a(2, 1) = y(2) : ys(2) = y(2)  Else Beep
+      Until s$
+      Do
+        Prompt "EINGABE", #10#10"Welchen Anfangswert hat die dritte Ableitung y3 ?", s$
+        If s$ Then y(3) = Val(s$) : a(3, 1) = y(3) : ys(3) = y(3)  Else Beep
+      Until s$
+    EndIf
+
+    Cls
+
+    If n = 1
+      Print "Ergebnis: Die Stammfunktion y0(x) und deren 1. Ableitung y1(x)"
+    Else
+      Print "Ergebnis: Die Stammfunktion y0(x) und deren Ableitungen bis zur "; n; ". Ordnung"""
+    EndIf
+'##E#
+    Print "haben im vorgegebenen Intervall folgenden numerischen Verlauf:"
+    Print
+
+    x = xa
+    ZUORDNUNG
+
+    Print "   x = "
+    Print Using(" ###,###", xa)
+    Locate 17, 4 : Print "y0(x)="
+    Locate 9, 5 : Print Using(" ######,########", y(0))
+
+    For i = 1 To n
+      Locate 17 + 17 * i, 4     : Print "y"; i; "(x)="
+      Locate 9 + 17 * i, CrsLin : Print Using(" ######,########", y(i))
+    Next i
+
+    t = (xe - xa) / h0
+    For u = 0 To t - 1
+      x0 = xa + u * h0 : p = 1 : h = h0 : a(n, 1) = y(n)
+      For i = 0 To n - 1
+        Add a(i, 1), h * a(i + 1, 1)
+      Next i
+      Print
+      For k = 2 To r
+        x = x0 : Mul p, 2 : Mul h, 0.5
+        For i = 0 To n - 1
+          a(i, k) = ys(i)
+        Next i
+        For j = 1 To p
+          For i = 0 To n - 1
+            y(i) = a(i, k)
+          Next i
+          ZUORDNUNG
+          a(n, k) = y(n)
+          For i = 0 To n - 1
+            Add a(i, k), h * a(i + 1, k)
+          Next i
+          x = x0 + j * h
+        Next j
+        z = 2
+        For j = k - 1 DownTo 1
+          For i = 0 To n - 1
+            a(i, j) = (a(i, j + 1) * z - a(i, j)) / (z - 1)
+          Next i
+          Mul z, 2
+        Next j
+
+        '---
+        '#### Seite 3
+        '---
+
+        v = 0
+        For i = 0 To n - 1
+          Add v, Sgn(e * Abs(a(i, 1)) - Abs(a(i, 1) - a(i, 2)))
+        Next i
+
+        If v = n
+          For i = 0 To n - 1
+            y(i) = a(i, 1) : ys(i) = y(i)
+          Next i
+          ZUORDNUNG
+          Locate 1, CrsLin - 1 : Print Using(" ###,###", Round(x0 + h0, 3))
+          For i = 0 To n
+            Locate 9 + 17 * i, CrsLin - 1 : Print Using(" ######,########", Round(y(i), 8))
+          Next i
+          k = r
+        ElseIf k = r
+          Print " Konnte keine weiteren Ergebnisse berechnen"
+          u = t
+        EndIf
+      Next k
+    Next u
+    Print : Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+  EndIf
+
+'##B#
+  //Beenden mit Fenster schließen
+
+Sub ZUORDNUNG
+  y0 = y(0)
+  y1 = y(1)
+  y2 = y(2)
+  y3 = y(3)
+  DIFFGLEI
+
+Sub DIFFGLEI
+  y(2) = -.00045 * (y1) ^ 2 - 6.003208624
+  Rem y(1) = y(0) ^ 2 / x

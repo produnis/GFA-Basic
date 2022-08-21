@@ -1,0 +1,60 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 gn, gz, i, j : Global Double s
+Print
+Print "                       Division von Polynomen"
+Print "                       **********************"
+Print
+Print " Ausgehend von einem Zählerpolynom z(x) und einem Nennerpolynom n(x)"
+Print " berechnet das Programm ein Ergebnispolynom  e(x) und gegebenenfalls"
+Print "      ein Restpolynom r(x), wobei gilt: z(x)/n(x)=e(x)+r(x)/n(x)"
+Print " ********************************************************************"
+Print
+Input " Von welchem Grad ist das Zählerpolynom z(x) ? ", gz
+Input " Von welchem Grad ist das Nennerpolynom n(x) ? ", gn
+Print
+If gz < gn
+  Print " Achtung Fehler! Der eingegebene Grad des Nennerpolynoms ist zu groß!"
+  Print
+  Print " Bitte beenden Sie den Programmablauf durch Schießen dieses Fensters"
+  Print " und beachten Sie bei einem Neustart, dass der Grad des Nennerpolynoms"
+  Print " nicht größer als jener des Zählerpolynoms sein darf."
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+
+Dim kz(gz), kn(gn), ke(gz - gn) As Double
+Print " Bitte geben Sie gemäß Aufruf die Koeffizienten kz von z(x) ein!"
+For i = gz DownTo 0
+  Print " kz(x^"; i; ") = " : Locate 12, CrsLin - 1 : Input kz(i)
+Next i
+Print
+Print " Geben Sie auf gleiche Weise auch die Koeffizienten kn von n(x) ein!"
+For i = gn DownTo 0
+  Print " kn(x^"; i; ") = " :  Locate 12, CrsLin - 1 : Input kn(i)
+Next i
+Print : Print " Ergebnis:"
+Print " Die Koeffizienten ke des Ergebnispolynoms e(x) sind:"
+'##E#
+
+For i = gz - gn DownTo 0
+  ke(i) = kz(i + gn) / kn(gn)
+  For j = i + gn DownTo i
+    Sub kz(j), ke(i) * kn(j - i)
+  Next j
+  Print " ke(x^"; i; ") = "; ke(i)
+Next i
+Print
+For i = gn - 1 DownTo 0
+  Add s, Abs(kz(i))
+Next i
+If s = 0
+  Print " Die Division ist ohne Rest aufgegangen!"
+Else
+  Print " Die Koeffizienten kr des Restpolynoms r(x) sind:"
+  For i = gn - 1 DownTo 0
+    Print " kr(x^"; i; ") = "; kz(i)
+  Next i
+EndIf
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

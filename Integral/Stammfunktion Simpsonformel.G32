@@ -1,0 +1,82 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, dx, g0, g1, g2, h, x, x0, xa, xe, y, y1, ya, ys : e = 10 ^ -12
+Global Int32 i, j, k, n, r, t, z, f$ : r = 22 : Dim yr(r) As Double
+Print
+Print "  Berechnung einer Stammfunktion y(x) zu einer gegebenen Ableitungsfunktion y1(x) durch Integration"
+Print "      mittels der Simpsonformel, mit Zuordnung eines Anfangswertes für y zum Anfangswert von x"
+Print "  (Vergleiche dazu: Lösung von Anfangswertaufgaben gewöhnlicher Differentialgleichungen 1. Ordnung)"
+Print "  *************************************************************************************************"
+Print
+Print " Beispiel für eine Anwendung dieses Programms"
+Print " AUFGABESTELLUNG: Die in der Größeneinheit Meter/Jahr definierte Wachstumsgeschwindigkeit einer"
+Print " Fichte, deren Höhe zum Pflanzzeitpunkt, vor zehn Jahren, 0.2 Meter betrug, wird als Funktion der"
+Print " Zeit x in Jahren durch die Gleichung y1 = 2*(x/10+1)^2*e^(-(x/10+1)) beschrieben."
+Print
+Print " FRAGE: Wie hat sich die Höhe y der Fichte in den vergangenen zehn Jahren entwickelt und wie wird"
+Print " sie sich in den folgenden 40 Jahren weiter entwickeln?"
+Print
+Print " LÖSUNG: Die Funktion y1(x) muss vor dem Start des Programms in dessen Quellcode eingegeben werden!"
+Print " Nach dem Start der Anwendung ist die Frage nach dem Anfangswert von x mit der Eingabe '-10' zu"
+Print " quittieren, die Frage nach dem zugehörigen Anfangswert für y mit der Eingabe '0.2' und die Frage"
+Print " nach dem Endwert für x mit der Eingabe '40'. Der weiterhin abgefragte Schrittweitenwert Delta-x"
+Print " für die Ergebnisausgabe ist frei wählbar. Im vorliegenden Fall bietet sich dafür der Wert '1' an."
+Print
+Print " ANMERKUNG: Die analytische Lösung für die hier gesuchte Stammfunktion lautet zum Vergleich:"
+Print " y = 40.2-20*((x/10+2)^2+1)*e^(-(x/10+1))"
+Print
+Print " Wurde die dem Beispiel zugrunde liegende oder eine andere zu integrierende Funktion y1(x) bereits"
+Print " in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage bitte mit einem 'j' für ja oder einem 'n' für nein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Beenden Sie jetzt den Programmablauf durch Schließen dieses Fensters und setzen Sie vor einem"
+  Print " Neustart die relevante Ableitungsfunktion y1(x) in das Unterprogramm 'Sub INTEGRAND' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Mit welchem Anfangswert für x soll die Integration von y1(x) starten? ", xa
+Input " Welchen Anfangswert soll die gesuchte Stammfunktion y(x) besitzen   ? ", ya
+Input " Bei welchem Wert von x soll die Integration von y1(x) enden         ? ", xe
+Input " Mit welchem Wert für Delta-x soll die Ergebnisausgabe fortschreiten ? ", dx
+Cls
+Print " Die gesuchte Stammfunktion y(x) und deren vorgegebene Ableitungsfunktion y1(x)"
+Print " haben über dem Intervall von x="; xa; " bis x="; xe; " folgenden numerischen Verlauf:"
+Print
+
+x = xa : INTEGRAND
+Print "     x                   y(x)=                   y1(x)="
+Print Format(x, " * ###0.00") : Locate 18, CrsLin - 1 : Print Format(ya, " * ######0.00000000")
+Locate 42, CrsLin - 1 : Print Format(y1, " * ######0.00000000")
+
+y = ya : t = (xe - xa) / dx
+For j = 1 To t
+  x0 = x : g0 = y1 : Add x, dx : INTEGRAND
+  Add g0, y1 : Sub x, dx / 2 : INTEGRAND
+  g1 = y1 : yr(1) = dx * (g0 + 4 * g1) / 6 : g2 = 0
+  For k = 2 To r
+    Add g2, g1 : g1 = 0 : n = 2 ^ (k - 1) : h = dx / n
+'##E#
+    For i = 1 To n
+      x = x0 + h * (i - 0.5) : INTEGRAND : Add g1, y1
+    Next i
+    yr(k) = h * (g0 + 4 * g1 + 2 * g2) / 6               'Simpsonformel
+    z = 16
+    For i = k - 1 DownTo 1
+      yr(i) = (yr(i + 1) * z - yr(i)) / (z - 1)          'Romberg-Extrapolation
+      Mul z, 4
+    Next i
+    Exit If Abs(yr(1) - yr(2)) < e
+  Next k
+  Add y, yr(1) : x = xa + j * dx : INTEGRAND
+  Print Format(x, " * ###0.00") : Locate 18, CrsLin - 1 : Print Format(y, " * ######0.00000000")
+  Locate 42, CrsLin - 1 : Print Format(y1, " * ######0.00000000")
+Next j
+Print
+Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub INTEGRAND                                           'In diese Subroutine die Funktion y1(x) einsetzen!
+  Rem y1 = 2 * (x / 10 + 1) ^ 2 * Exp(-(x / 10 + 1))    'Beispiel Fichtenwachstum
+  Rem y1 = 1 / 8 * (x - 1) * (x - 4) * (x + 3)
+  y1 = x ^ 2 + 2 * x - 8
+Return

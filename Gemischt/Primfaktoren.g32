@@ -1,0 +1,44 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, j, n, u, v : Global Int64 t, z : Global Double q
+Global e$, s$, z$ : Dim p(100) As Int64
+Print
+Print " Zerlegung nat¸rlicher Zahlen mit maximal 15 Stellen in Primfaktoren"
+Print " *******************************************************************"
+Print
+Input " Wie lautet die zu faktorisierende nat¸rliche Zahl? ", z$
+Print
+z = Val(z$) : q = z : n = 1 : u = 2 : v = 4
+For t = 2 To 3     'Division durch die Teiler t=2 und t=3
+  While q > t
+    q = z / t : Exit If Frac(q) : p(n) = t : Inc n : z = q
+  Wend
+Next t
+t = 5
+While q > t    'Division durch ungerade Teiler t>=5, unter Auslassung Vielfacher von 3
+  q = z / t
+  If Frac(q) : Add t, u : Swap u, v
+  Else : p(n) = t : Inc n : z = q
+  EndIf
+Wend
+p(n) = z
+If n = 1 And z = 0
+  Print " Ergebnis:  "; z$; " = "; 0
+Else If n = 1 And z > 1
+  Print " Ergebnis:  Die Zahl "; z$; " ist eine Primzahl!"
+'##E#
+Else : s$ = "*"
+  For i = 1 To n
+    If i = n Then s$ = ""
+    If p(i + 1) <> p(i)
+      If i - j = 1 : e$ = e$ + Str$(p(i)) + s$
+      Else :  e$ = e$ + Str$(p(i)) + "^" + Str$(i - j) + s$
+      EndIf
+      j = i
+    EndIf
+  Next i
+  Print " Ergebnis:  "; z$; " = "; e$
+EndIf
+Print
+Print " ENDE  Durch Schlieﬂen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : CloseW # 1 : End

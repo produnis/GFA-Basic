@@ -1,0 +1,28 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, n, w, t : Global Int64 k, g : Dim d(8) As Int32
+Print
+Print "            Berechnung von Primzahlen durch Prüfung natürlicher Zahlen k"
+Print "            auf restfreie Teilbarkeit durch ungerade Zahlen t<=Wurzel(k)"
+Print "                                  Standardversion 2"
+Print "            ************************************************************"
+Print
+Input " Bei welcher Obergrenze 5=<g<=250000000 der natürlichen Zahlen soll die Primzahlensuche enden? ", g
+d(1) = 4 : d(2) = 2 : d(3) = 4 : d(4) = 2 : d(5) = 4 : d(6) = 6 : d(7) = 2 : d(8) = 6
+k = 7 : n = 3
+Print : Print " Ergebnis" : Print " 2 3 5";
+For i = 1 To 8
+  w = Sqr(k)
+  For t = 7 To w Step 2     'Vielfache von 2 und 3 der Zahlen t werden übersprungen
+    Exit If Mod(k, t) = 0
+    Add t, 4
+    Exit If Mod(k, t) = 0
+  Next t
+  If t > w Then Print " "; k; : Inc n
+  Add k, d(i)               'Vielfache von 2, 3 und 5 der Zahlen k werden übersprungen
+  If k > g Then i = 8 Else If i = 8 Then i = 0
+Next i
+Print
+Print " Der Zahlenbereich von  2  bis "; g; " enthält "; n; " Primzahlen"
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

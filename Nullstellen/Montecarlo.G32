@@ -1,0 +1,65 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, s, x, x, x1, x, x0, xo, xk, xu, y, y0, y1 : Dim xn(100) As Double
+Global Int32 i, n : Global a$ : s = 0.01013 : e = 10 ^ -12
+Print
+Print "    Berechnung der Einfachnullstellen (Schnittnullstellen) von Funktionen y=f(x)"
+Print "                           nach der Monte-Carlo-Methode"
+'##E#
+Print "    ****************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", a$
+Print
+
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+
+Print " In welchem Intervall der Variablen x soll nach Nullstellen gesucht werden?"
+Input " Untere Intervallgrenze xu = ? ";x
+Input " Obere  Intervallgrenze xo = ? ";xo
+Add x, 0.00013 : n = 0
+
+Do
+  FUNKTION
+  Repeat : y0 = y : Add x, s               'Suche nach Vorzeichenänderung von y
+    If x > xo + s
+      Print : Print " Ergebnis:"
+      If n = 0 : Print " Keine Nullstelle gefunden!"
+      Else If n = 1 : Print " Eine Nullstelle ist bei"
+        Print " x = "; Round(xn(1), 8)
+      Else : Print " Nullstellen sind bei"
+        For i = 1 To n
+          Print " x = "; Round(xn(i), 8)
+        Next i
+      EndIf
+      Print : Print " ENDE  Durch Schließen dieses Fensters wird die Anwendung beendet!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    FUNKTION
+  Until Sgn(y) <> Sgn(y0)
+  xk = x : x1 = x : y1 = y : Sub x, s / 2 : FUNKTION
+  If Sgn(y) = Sgn(y1) And Abs(y) < Abs(y1) Or Sgn(y) = Sgn(y0) And Abs(y) < Abs(y0)
+    x0 = x1 - s
+    Repeat                                 'Iteration nach der Monte-Carlo-Methode
+      x = x0 + (x1 - x0) * Rnd : FUNKTION  'Rnd generiert Zufallszahl zwischen 0 und 1
+      If Sgn(y) <> Sgn(y0) : x1 = x
+      Else : x0 = x
+      EndIf
+    Until Abs(y) < e
+    Inc n : xn(n) = x : Add x, s
+  Else : x = xk + s
+  EndIf
+Loop
+
+Sub FUNKTION              'In diese Subroutine y=f(x) eingeben!
+  Rem y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y=1/x-1
+  Rem y = Tan(x)
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) + 6
+  y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) - 6
+Return

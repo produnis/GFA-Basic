@@ -1,0 +1,31 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 a, a0, b, i, n, n$
+Print
+Print " Kleinstes gemeinsames Vielfaches von n verschiedenen nat¸rlichen Zahlen"
+Print " ***********************************************************************"
+Print
+Input " Von wie vielen nat¸rlichen Zahlen >=2 wird das kgV gesucht? ", n
+Print
+Dim z(n) As Int32
+For i = 1 To n
+  Print " "; i; ". Zahl = "
+  Locate 12, CrsLin - 1
+  Input z(i)
+Next i
+a = z(1)
+For i = 2 To n
+  b = z(i) : a0 = a
+  While b
+    Sub a, b * Int(a / b)
+    Exit If a = 0
+'##E#
+    Sub b, a * Int(b / a)
+  Wend
+  a = a0 * z(i) / (a + b)
+Next i
+Print
+Print " Ergebnis:  Das kgV ist "; a
+Print
+Print " ENDE   Durch Schlieﬂen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

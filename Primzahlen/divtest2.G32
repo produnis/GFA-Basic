@@ -1,0 +1,35 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 a, b, n, t, w : Global Int64 k, og, u, ug
+Print
+Print "          Berechnung von Primzahlen durch Prüfung natürlicher Zahlen k"
+Print "          auf restfreie Teilbarkeit durch ungerade Zahlen t<=Wurzel(k)"
+Print "                               (Intervallversion)"
+Print "          ************************************************************"
+Print
+Print " In welchem Intervall der natürlichen Zahlen mit der kleinsten Untergrenze 5"
+Print " und der größten Obergrenze 250000000 sollen Primzahlen berechnet werden?"
+Repeat
+  Input " Untere  Intervallgrenze (natürliche Zahl >=5) =  ";ug
+  Input " Obere Intervallgrenze (nat. Zahl <=250000000) =  ";og
+'##E#
+  If ug < 5 Or og > 250000000 Or ug >= og
+    Print " Die Eingaben passen nicht, bitte ändern!"
+  EndIf
+Until og > ug And ug >= 5 And og <= 250000000
+Print : Print " Ergebnis:"
+u = 5 + 6 * Int((ug - 5) / 6) : a = 1 : b = 3
+For k = u To og            'Vielfache von 2 und 3 der Zahlen k werden übersprungen
+  w = Sqr(k)
+  For t = 5 To w Step 4    'Vielfache von 2 und 3 der Zahlen t werden übersprungen
+    Exit If Mod(k, t) = 0
+    Add t, 2
+    Exit If Mod(k, t) = 0
+  Next t
+  If t > w Then  Print " "; k; : Inc n
+  Add k, a : Swap a, b
+Next k
+Print
+Print " Der Zahlenbereich von "; u; " bis "; og; " enthält "; n; " Primzahlen"
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

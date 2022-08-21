@@ -1,0 +1,63 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 ga, gb, ge, i, j : Global o$
+Print
+Print "              Multiplikation und Quadrierung von Polynomen"
+Print "              ********************************************"
+Print
+Print " Welche Operation wird gewünscht, eine Multiplikation oder eine Quadrierung? "
+Input " Bitte geben Sie eim 'm' für Multiplikation oder ein 'q' fur Quadrierung ein! ", o$
+Print
+If o$ <> "m" And o$ <> "q"
+  Print " Falsche Eingabe! Bitte Schließen dieses Fenster und starten Sie das"
+  Print " Programm erneut!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+Else If o$ = "m"
+  Print " Das Programm multipliziert gegebene Polynome a(x) und b(x) zum"
+  Print " Ergebnispolynom e(x)"
+Else
+  Print " Das Programm quadriert ein gegebenes Polynom a(x) zum Ergebnispolynom e(x)"
+EndIf : Print
+
+Input " Von welchem Grad ist das Polynom a(x) ? ", ga
+Print " Bitte geben Sie gemäß Aufruf die Koeffizienten ka von a(x) ein!"
+Dim ka(ga) As Double
+For i = ga DownTo 0
+  Print " ka(x^"; i; ") = " : Locate 12, CrsLin - 1 : Input ka(i)
+Next i : Print
+
+If o$ = "m"
+  Input " Von Welchem Grad ist das Polynom b(x) ? ", gb
+  Print " Geben Sie bitte nachfolgend auch die Koeffizienten kb von b(x) ein!"
+  Dim kb(gb) As Double
+  For i = gb DownTo 0
+    Print " kb(x^"; i; ") = " : Locate 12, CrsLin - 1 : Input kb(i)
+  Next i
+  ge = ga + gb :  Dim ke(ge) As Double : BERECHNUNG
+  Print : Print " Die Koeffizienten des Ergebnispolynoms e(x) sind:"
+  For i = ge DownTo 0
+    Print " ke(x^"; i; ") = "; ke(i)
+  Next i
+Else If o$ = "q"
+  gb = ga :  Dim kb(gb) As Double
+  For i = gb DownTo 0
+    kb(i) = ka(i)
+  Next i
+  ge = 2 * ga :  Dim ke(ge) As Double : BERECHNUNG
+  Print " Die Koeffizienten des Ergebnispolynoms e(x) sind:"
+  For i = ge DownTo 0
+'##E#
+    Print " ke(x^"; i; ") = "; ke(i)
+  Next i
+EndIf
+
+Print : Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub BERECHNUNG
+  For i = ga DownTo 0
+    For j = gb DownTo 0
+      Add ke(i + j), ka(i) * kb(j)
+    Next j
+  Next i
+Return

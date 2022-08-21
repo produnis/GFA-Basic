@@ -1,0 +1,61 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, r : r = 100 : Global Double e, x, x1 : e = 10 ^ -12 : Global a$
+Print
+Print " Berechnung einzelner Nullstellen von Funktionen y=f(x) bzw. einer Lösung"
+Print "            der Gleichung f(x)=0 durch sukzessive Approximation"
+Print " ************************************************************************"
+Print
+Print " Achtung!"
+Print " Diese Anwendung erfordert es, die zu lösende Gleichung f(x)=0 in eine"
+Print " Formel der Gestalt x=g(x) (sogenannte Fixpunktform) zu entwickeln und"
+Print " diese in das Unterprogramm 'Sub iterationsformel' einzusetzen."
+Print
+Print " Beispiel: Zu lösen sei die Gleichung f(x)=exp(x-2)-x^3+1=0. Sie lässt"
+Print " sich umgestalten in die Fixpunktformen"
+Print
+Print " a) x=(exp(x-2)+1)^(1/3)  b) x=((exp(x-2)+1)/x)^0.5"
+Print " c) x=(exp(x-2)+1)/x^2    d) x=2+LOG(x^3-1),  Log=Logarithmus naturalis"
+Print
+Print " Anmerkung: Nur die erstgenannte dieser beiden Umformungen erweist sich"
+Print " als iterierfähig. Bei mehreren Möglichkeiten wird Probieren empfohlen."
+Print
+Print " Frage: Wurde die aktuell zu lösende Gleichung f(x)=0 bereits in x=g(x)"
+Print " umgewandelt und in das Unterprogramm 'Sub iterationsformel' eingegeben?"
+Input " Tippen Sie hier ein j für ja oder ein n für nein ein! ", a$
+Print
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die Iterationsformel x=g(x) in das"
+  Print " Unterprogramm 'Sub iterationsformel' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+'##E#
+EndIf
+Print " Mit welchem Schätzwert für x soll die Iteration starten?"
+Print " Wählen Sie diesen Wert aus einem Intervall, in dem Sie einen Fixpunkt,"
+Print " d.h. eine Nullstelle von f(x) bzw. einen Schnittpunkt der Funktionen"
+Print " y=x und y=g(x) vermuten."
+Input " x= ";x
+Print
+Print " Ergebnis:"
+
+For i = 1 To r
+  x1 = x : ITERATIONSFORMEL
+  If Abs(x - x1) <= e
+    Print " Fixpunkt bei x = "; Round(x, 8)
+    i = r
+  Else If i = r
+    Print " Nach "; r; " Iterationen wurde kein Fixpunkt gefunden!"
+  EndIf
+Next i
+Print
+Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub ITERATIONSFORMEL                 'In diese Subroutine x=g(x) eingeben!
+  Rem x = Cos(x)
+  x = (Exp(x - 2) + 1) ^ (1 / 3)
+  Rem x = ((Exp(x - 2) + 1) / x) ^ (1 / 2)
+  Rem x = (Exp(x - 2) + 1) / x ^ 2   'nicht iterierfähig
+  Rem x = 2 + Log(x ^ 3 - 1)
+Return

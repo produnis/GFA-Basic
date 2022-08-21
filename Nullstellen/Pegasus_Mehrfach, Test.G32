@@ -1,0 +1,214 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Auto a As Double, b As Double, di As Double, e&, f$
+Auto h As Double, i%, j As Double, k&, n&, q As Double
+Auto s As Double, sv As Double, v As Double, v0 As Double
+Auto v1 As Double, vf As Double, w As Double, x As Double
+Auto x0 As Double, x1 As Double, xk As Double, xm As Double
+Auto y As Double, yf As Double, z&, zm&
+Print
+Print " Numerische Berechnung reeller Einfach- und Mehrfachnullstellen von Funktionen f(x)"
+Print "  nach der Pegasusmethode, mit Bestimmung der Vielfachheit von Mehrfachnullstellen"
+Print " **********************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein!  ", f$
+If f$ <> "j" And f$ <> "ja"
+  Print
+  Print " Bitte beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben"
+  Print " Sie vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub funktion' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print
+Input " Untere Intervallgrenze für x ? ", a
+Input " Obere  Intervallgrenze für x ? ", b
+Print " Mit welcher Schrittweite 'Delta-x' soll dieses Intervall ausgehend von der"
+Print " Untergrenze 'abgetastet' werden ? (empfohlener Startwert: Delta-x = 0.1)"
+Input " Delta-x = ? ", s
+If s <= 0 Then s = 0.1
+Sub a, 0.00031
+Add s, 0.00013
+Print
+Print " Ergebnis:"
+Dim xn(3), yn(3)
+n& = 0
+xm = a
+start:
+Do
+  ableitung
+  Repeat                        'Suche nach Vorzeichenwechseln
+    x0 = xm
+    v0 = v
+    Add xm, s
+    If xm > b
+      If n& = 0
+        Rem stop
+        Inc n&
+        xm = a
+        GoTo start
+      Else
+        If e& = 0
+          Print " Im vorgegebenen Intervall  konnte  keine  Nullstelle von f(x) gefunden werden!"
+          Print " Eventuell führt ein Neustart des  Programms mit kleinerer Schrittweite Delta-x"
+          Print " und/oder einem anderen bzw. erweiterten zu untersuchenden Intervall zum Erfolg."
+        EndIf
+        Print
+        Print " Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+        Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+      EndIf
+    EndIf
+    ableitung
+  Until Sgn(v) <> Sgn(v0)
+  z& = 0
+  zm& = 200
+  Repeat                       'Einschachtelung der Nullstelle nach der Pegasus-Methode
+    x1 = xm
+    v1 = v
+    Sub xm, v1 * (x1 - x0) / (v1 - v0)
+    ableitung
+    If Abs(v) > 10 ^ 8            'Erkennung von Polstellen mit Vorzeichenwechsel
+      Add xm, 0.0503
+      GoTo start
+    Else If Sgn(v) = Sgn(v1)
+      sv = v1 + v
+      Exit If Abs(sv) < 10 ^ -13
+      Mul v0, v1 / sv
+    Else
+      x0 = x1
+      v0 = v1
+    EndIf
+    If z& = zm&
+      If e&
+        Print
+      EndIf
+      Print " Achtung!"
+      Print " Der Programmablauf wurde unterbrochen, da eine Nullstelle nach "; zm&; " Iterationen"
+      Print " nicht mit der verlangten Genauigkeit berechnet werden konnte."
+      Print " Starten Sie das Programm in diesem Fall neu und versuchen Sie mit einer größeren"
+      Print " oder kleineren Schrittweite 'Delta-x' zum Erfolg zu kommen."
+      Print " Empfohlen werden Schrittweiten 'Delta-x' von 0.001 bis 0.5"
+      Print
+      Print " Durch Drücken der Leertaste beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    Inc z&
+  Until Abs(xm - x1) < 10 ^ -13
+  If n& = 0
+    mehrfach
+    Print Using("##fach&Nullstelle bei x = ####,####", j, "-", xm)
+    Inc e&
+    n& = 0
+  Else                             'Prüfung auf Nullstelle der Stammfunktion
+    x = xm
+    funktion
+    If Abs(y) < 10 ^ -5
+      mehrfach
+      Print Using("##fach&Nullstelle bei x = ####,####", j, "-", xm)
+      Inc e&
+      n& = 1
+    EndIf
+  EndIf
+  Add xm, 0.103
+Loop
+Procedure ableitung
+  If n&
+    h = 10 ^ -(6.5 / n&)
+    q = 0
+    For k& = 0 To n&
+      x = xm + h * (n& - 2 * k&)
+      funktion
+      Add q, (-1) ^ k& * y * Combin(n&, k&)
+    Next k&
+    v = q / (2 * h) ^ n&
+  Else
+    x = xm
+    funktion
+    v = y
+  EndIf
+Return
+Procedure mehrfach
+  xk = xm
+  Repeat                           'Bestimmung der Vielfachheit
+    Add xm, 0.001
+    x = xm
+    funktion
+  Until Abs(y) > 10 ^ -5
+  yf = y
+  n& = 1
+  ableitung
+  vf = v
+  n& = 2
+  ableitung
+  j = Round(1 / (1 - v * yf / (vf * vf)))
+  If j > 3
+    Sub xm, j * yf / vf
+    w = 8
+    For i% = 1 To 3                  'Extrapolation
+      Repeat
+        Add xm, 0.001
+        x = xm
+        funktion
+      Until Abs(y) > 10 ^ -w
+      yn(i%) = y
+      n& = 1
+      ableitung
+      xn(i%) = xm - j * yn(i%) / v
+      Sub w, 3
+    Next i%
+    di = xn(3) - xn(2)
+    xm = xn(3) - di * di / (di - xn(2) + xn(1))
+  Else
+    xm = xk
+  EndIf
+Return
+Procedure funktion                 'In diese PROCEDURE y=f(x) einsetzen
+  Rem y=0.000005*x-0.000025
+  Rem y=x^5
+  Rem y=(x-4)^8
+  Rem y=EXP(x)-2*x-5
+  Rem y=EXP(-0.5*(x-1)^2)-0.5
+  Rem y=x^3*EXP(x)-0.5*x
+  Rem y=4/9*x*(x^2-9)*EXP(-x^2/6)
+  Rem y=(2*x^2-7*x+5)*EXP(x)-9*EXP(-0.5)
+  Rem y=1/(x-1)^4-5
+  Rem y=x/2+2/(x-2)^2-4
+  Rem y=2/(x-1)-4/(x-3)+2*x+6
+  Rem y=(x^3-x^2-6*x)/(x-1)^3
+  Rem y=(x^2-4*x+5)/(x+1)^2-2
+  Rem y=x^2/(1+0.1*x^3)-0.5*(x+1)
+  Rem y=(1-x^2)/(1+x^2)^2
+  y = x ^ 2 * (x ^ 2 - 4 * x + 4) * (x ^ 3 + 1) / (2 * x + 4)
+  Rem y=0.5*x^2+2*x+SIN(x)+1
+  Rem y=x+SIN(x+PI)
+  Rem y=TAN(x)-x
+  Rem y=x*TAN(x)
+  Rem y=x*(SIN(x)+COS(x))-3.595137
+  Rem y=SIN(x+SIN(x))
+  Rem y=x*LOG(ABS(x))
+  Rem y=ABS(ABS(x-1)-2)
+  Rem y=1-ABS(SIN(0.5*x))
+  Rem y=ABS(x*SIN(x))
+  Rem y=(COS(x-3)-1)^4
+  Rem y=ABS(x)^x-x^3+x^2-1
+  Rem y=SQR(ABS(x^2-1))
+  Rem y=0.5*ABS(x-5)^11
+  Rem y=SQR(1+SIN(x-PI/3))-0.5
+  Rem y=x^3-6*x^2+11*x-6.3849
+  Rem y=x^4-5*x^2+4
+  Rem y=x^2-(49-x^2)*(x-1)^2
+  Rem y=x^4+x^3-x^2+x+1
+  Rem y=x^4-9*x^3+27*x^2-31*x+12
+  Rem y=x^4-10*x^3+35*x^2-50*x+24
+  Rem y=x^4-10*x^3+35*x^2-50*x+23.4375
+  Rem y=x^4-10*x^3+35*x^2-50*x+25
+  Rem y=0.1*x^5-6*x^3+x^2+3*x+20
+  Rem y=x^4-4*x^3+6*x^2-4*x+1
+  Rem y=x^5-5*x^4+10*x^3-10*x^2+5*x-1
+  Rem y=x^6-6*x^5+15*x^4-20*x^3+15*x^2-6*x+1
+  Rem y=x^7+7*x^6+21*x^5+35*x^4+35*x^3+21*x^2+7*x+1
+  Rem y=x^8-8*x^7+28*x^6-56*x^5+70*x^4-56*x^3+28*x^2-8*x+1
+  Rem y=x^6-18*x^5+120*x^4-346*x^3+315*x^2+300*x-500
+  Rem y=x^6+4*x^5-54*x^4-160*x^3+641*x^2+828*x-1260
+  Rem y = 1 / x - 1
+Return

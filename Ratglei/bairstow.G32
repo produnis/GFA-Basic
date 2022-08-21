@@ -1,0 +1,110 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double d, p, q, t, u, v : Global Int32 e, i, k, n, z : Global a$, b$, f$
+Print
+Print " Numerische Lösung ganzrationaler Gleichungen 2. bis 7. Grades nach dem Bairstow-Verfahren"
+Print "                  ohne Optimierung der Genauigkeit von Mehrfachergebnissen"
+Print " *****************************************************************************************"
+Print
+Print " Von welchem Grad 2=<n<=7 ist die zu untersuchende ganzrationale Gleichung ?"
+Input " n = ";n
+Print
+While n < 2 Or n > 7
+  Print " Fehleingabe! Der Gleichungsgrad 'n' muss ganzzahlig >=2 und <=7 sein!"
+  Input " n = ";n
+Wend
+
+Print " Achtung! Das Programm erwartet die Gleichungsform:"
+If n > 5
+  Print " a"; n; "*x^"; n; "+a"; n - 1; "*x^"; n - 1; "+a"; n - 2; "*x^"; n - 2; "+....+a1*x+a0 = 0"
+  Print
+  Print " Welche relevanten Werte haben die Faktoren a"; n; ", a"; n - 1; ", a"; n - 2; ", usw., bis a0 ?"
+Else
+  a$ = "a5*x^5+a4*x^4+a3*x^3+a2*x^2+a1*x+a0 = 0"
+  b$ = "a5, a4, a3, a2, a1, a0"
+  Print " " + Right$(a$, Len(a$) - 7 * (5 - n))
+  Print
+  Print " Welche relevanten Werte haben die Faktoren " + Right$(b$, Len(b$) - 4 * (5 - n)) + " ?"
+EndIf
+Dim a(n), b(n + 2), c(n + 2) As Double
+k = 1
+For i = n DownTo 0
+  Print " a"; i; " ="
+  Locate 6, CrsLin - 1
+  Input a(i)
+Next i
+For i = 0 To n - 1
+  Div a(i), a(n)
+Next i
+a(n) = 1
+Print
+
+Print " Für die durchzuführenden Iterationen benötigt das Programm Anfangswerte"
+Print " für zwei Koeffizienten p und q. Empfohlen werden beim Erststart der"
+Print " Anwendung die Eingaben: p=0.1 und q=1."
+Input " p = ";p
+Input " q = ";q
+Print
+
+Print " Die Lösungen sind:"
+Repeat
+  e = 40
+  Repeat
+    For i = n DownTo 0
+      b(i) = a(i) - p * b(i + 1) - q * b(i + 2)
+      c(i) = b(i) - p * c(i + 1) - q * c(i + 2)
+    Next i
+    t = c(2) * c(2) - c(1) * c(3)
+    Add p, (b(1) * c(2) - b(0) * c(3)) / t
+    Add q, (b(0) * c(2) - b(1) * c(1)) / t
+    Inc z
+    If z = 100
+      If e > 15
+        Sub e, 5
+      Else If e <= 15 And e > 5
+        Dec e
+      Else
+        Locate 1, CrsLin - 1
+        Print " Achtung! Die Iteration wurde abgebrochen, da eine im Programm"
+        Print " vorgegebene Fehler- bzw. Toleranzschranke überschritten wurde."
+        Print " Eventuell führt ein neuer Versuch mit anderen Anfangswerten"
+        Print " für die Faktoren 'p' und 'q' zum Erfolg."
+        Print
+        Print " Durch Drücken der Leertaste beenden Sie die Anwendung!"
+        Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+      EndIf
+      z = 0
+    EndIf
+  Until Abs(b(0)) <= 10 ^ -e
+
+  Do
+    u = -p / 2
+    d = u * u - q
+    If Abs(d) < 10 ^ -8 Then d = 0
+    v = Sqr(Abs(d))
+    If d >= 0
+      Print " x"; k; " = "; Round(u + v, 5)
+      Print " x"; k + 1; " = "; Round(u - v, 5)
+    Else
+      Print " x"; k; " = "; Round(u, 5); " + i*"; Round(v, 5)
+      Print " x"; k + 1; " = "; Round(u, 5); " - i*"; Round(v, 5)
+    EndIf
+    Sub n, 2 : Add k, 2
+    Exit If n <> 2
+    p = b(3) / b(4) : q = b(2) / b(4)
+  Loop
+
+  If n = 1
+    Print " x"; k; " = "; Round(-b(2), 5)
+    Dec n
+  Else If n > 2
+    For i = n DownTo 0
+      a(i) = b(i + 2)
+    Next i
+    b(n + 1) = 0 : b(n + 2) = 0
+    c(n + 1) = 0 : c(n + 2) = 0
+  EndIf
+Until n = 0
+Print
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie den Programmablauf!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

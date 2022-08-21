@@ -1,0 +1,58 @@
+'##E#
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, h, m, s, x, xe, y, y0 : Global Int32 i, n, v : Global a$, p!
+Dim x0(100) As Double : s = 0.01013 : e = 10 ^ -12
+Print
+Print "   Berechnung der Einfachnullstellen (Schnittnullstellen) von Funktionen y=f(x)"
+Print "           durch Intervallschachtelung nach der Vorzeichenwechselmethode"
+Print "   ****************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", a$
+Print
+
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+
+Input " Mit welchem Wert der Variablen x soll die Nullstellensuche starten? ", x
+Input " Bei welchem Wert der Variablen x soll die Nullstellensuche enden  ? ", xe
+Add x, 0.00013 : m = -3 : n = 0
+
+Do
+  p! = False : FUNKTION : y0 = y
+  Repeat : Add x, s                      'Suche nach Vorzeichenänderung von y
+    If x > xe + s
+      Print : Print " Ergebnis:"
+      If n = 0 :  Print " Keine Nullstelle gefunden!"
+      Else If n = 1 : Print " Eine Nullstelle ist bei"
+        Print " x = "; Round(x0(1), 8)
+      Else : Print " Nullstellen sind bei"
+        For i = 1 To n
+          Print " x = "; Round(x0(i), 8)
+        Next i
+      EndIf
+      Print : Print " ENDE  Durch Schließen dieses Fensters wird die Anwendung beendet!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    FUNKTION
+  Until Sgn(y) <> Sgn(y0)
+  h = s
+  Repeat : v = Sgn(y) : Div h, m
+    Repeat : Add x, h : FUNKTION
+      If Abs(y) > 10 ^ 2 Then p! = True  'Erkennung von Polstellen mit Vorzeichenwechsel
+    Until Sgn(y) <> v
+  Until Abs(h) < e Or p! = True
+  If Not p! Then Inc n : x0(n) = x
+  Add x, 0.031
+Loop
+
+Sub FUNKTION                             'In diese Subroutine y=f(x) eingeben!
+  y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = 1 / x - 1
+  Rem y = 1 / (x + 1) + 1 / (x + 2) + 1 / x + 1 / (x - 1) + 1 / (x - 2) + 1 / (x - 3) + 1 / (x - 4) - 4
+Return

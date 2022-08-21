@@ -1,0 +1,55 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, r : Global Double e, x, x1 : e = 10 ^ -12 : Global a$
+Print
+Print " Berechnung einzelner Nullstellen von Funktionen y=f(x) bzw. einer Lösung"
+Print "            der Gleichung f(x)=0 durch sukzessive Approximation"
+Print " ************************************************************************"
+Print
+Print " Achtung!"
+Print " Diese Anwendung erfordert es, die zu lösende Gleichung f(x)=0 in eine"
+Print " Formel der Gestalt x=g(x) (sogenannte Fixpunktform) zu entwickeln und"
+Print " diese in das Unterprogramm 'Sub ITERATIONSFORMEL' einzusetzen."
+Print
+Print " Beispiel: Die zu lösende Gleichung sei f(x)=exp(x-2)-x^3+1=0. Sie wird"
+Print " umgeformt in  x=(exp(x-2)+1)^(1/3)  oder  x=2+ln(x^3-1)"
+Print " Anmerkung: Nur die erstgenannte dieser beiden Umformungen erweist sich"
+Print " als iterierfähig. Bei mehreren Möglichkeiten wird Probieren empfohlen."
+Print
+Print " Frage: Wurde die aktuell zu lösende Gleichung f(x)=0 bereits in x=g(x)"
+Print " umgewandelt und in das Unterprogramm 'Sub ITERATIONSFORMEL' eingegeben?"
+Input " Tippen Sie hier ein 'j' für ja oder ein 'n' für nein ein! ", a$
+Print
+'##E#
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die Iterationsformel x=g(x) in das"
+  Print " Unterprogramm 'Sub ITERATIONSFORMEL' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print " Mit welchem Wert von x soll die Iteration starten ?"
+Print " Wählen Sie diesen Wert aus einem Intervall, in dem Sie einen Fixpunkt,"
+Print " d.h. eine Nullstelle von f(x) bzw. einen Schnittpunkt der Funktionen"
+Print " y=x und y=g(x) vermuten."
+Input " x= ";x
+Print
+Print " Ergebnis:"
+r = 100
+For i = 1 To r
+  x1 = x : ITERATIONSFORMEL
+  If Abs(x - x1) < e
+    Print " Fixpunkt bei x = "; Round(x, 8)
+    i = r
+  Else If i = r
+    Print " Nach "; r; " Iterationen keinen Fixpunkt gefunden!"
+  EndIf
+Next i
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub ITERATIONSFORMEL      'In diese Subroutine x=g(x) eingeben!
+  Rem x = Cos(x)
+  x = (Exp(x - 2) + 1) ^ (1 / 3)
+  Rem x = 2 + Log(x ^ 3 - 1)
+Return

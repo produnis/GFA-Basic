@@ -1,0 +1,24 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 n, u, v, w, z : Global Int64 g, k
+Print
+Print "         Berechnung von Primzahlen p durch Prüfung natürlicher Zahlen k"
+Print "             auf restfreie Teilbarkeit durch Primzahlen p<=Wurzel(k)"
+Print "                                Standardversion 1"
+Print "         **************************************************************"
+Print
+'##E#
+Input " Bis zu welcher Grenze 5=<g<=25*10^7 der natürlichen Zahlen sollen Primzahlen berechnet werden? ", g
+If g < 5 Then g = 5
+Dim p(6 + Int(1.15 * g / Log(g))) As Int64 : z = 3 : u = 3 : v = 1
+Print : Print " Ergebnis" : Print " 2  3  5";
+For k = 7 To g           'Vielfache von 2 und 3 der Zahlen k werden übersprungen
+  w = Sqr(k) : n = 3 : p(n) = 5
+  While p(n) <= w And Mod(k, p(n)) : Inc n : Wend
+  If p(n) > w  Then Print " "; k; : Inc z : p(z) = k
+  Add k, u : Swap u, v
+Next k
+Print
+Print " Der Zahlenbereich von 2 bis "; g; " enthält "; z; " Primzahlen"
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

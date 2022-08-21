@@ -1,0 +1,238 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i%, j%, m%, n%, r%, t%, a$, b$, c$, d$, e$
+Global Double a, e, f, f0, f1, h, kn, p, s, v, v0, v1, ve, x, xo, xu, y
+Print
+Print "         Approximation analytischer oder numerischer Funktionen y(x)"
+Print "                       durch Polynome p(x) nach Newton"
+Print "         ***********************************************************"
+Print
+Print " Liegt die zu approximierende Funktion y(x) analytisch (als Gleichung) oder numerisch"
+Print " als Folge einzelner Punkte vor? Bitte geben Sie den Buchstaben a für analytisch oder"
+Input " oder den Buchstaben n für numerisch ein! ", a$
+Print
+If a$ = "a"
+  Input " Wurde die Funktionsgleichung y=y(x) bereits ins Programm eingegeben, j/n ? ", b$
+  Print
+  If b$ <> "j" And b$ <> "ja"
+    Print " Bitte geben Sie zuerst y=y(x) in das Unterprogramm 'Sub funktion' ein!"
+    Print
+    Print " Durch Drücken der Leertaste beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  EndIf
+EndIf
+Print " Innerhalb welcher Intervallgrenzen wird die Approximation von y(x) gewünscht ?"
+Input " Untere Grenze xu = ";xu
+Input " Obere  Grenze xo = ";xo
+Print
+Input " Von welchem Grad 1<=n<=25 soll das Approximationspolynom höchstens sein? ", n%
+Print
+Print " Anmerkung: Zur Berechnung des Approximationspolynoms "; n%; ". Grades werden von der"
+Print " zu approximierenden Funktion y(x) im betrachteten Intervall die x/y-Koordinaten"
+Print " von "; n% + 1; " verschiedenen Punkten benötigt."
+Dim c(n%), k(n%), ka(n% + 1), kb(n% + 1), kc(n% + 1), q(n%, n%), u(n%, n%), vd(n%), xd(n%), yd(n%) As Double
+If a$ = "n"
+  Print " Bitte geben Sie diese Punktekoordinaten gemäß folgendem Aufruf geordnet nach"
+  Print " steigenden oder fallenden x-Werten ein und beachten Sie dabei, dass letztere"
+  Print " innerhalb des Approximationsintervalls mit den vorgegebenen Grenzen xu="; xu; " und"
+  Print " xo="; xo; " liegen müssen. Die Grenzen sollten möglichtst selbst Stützstellen sein."
+  For i% = 0 To n%
+    If i% < 10
+      Print " x"; i%; " = "
+    Else
+      Print " x"; i%; "= "
+    EndIf
+    Locate 6, CrsLin - 1 : Input xd(i%)
+    Locate 20, CrsLin - 1
+    If i% < 10
+      Print "y"; i%; " = "
+    Else
+      Print "y"; i%; "= "
+    EndIf
+    Locate 25, CrsLin - 1 : Input yd(i%)
+  Next i%
+  newton
+Else If a$ = "a"
+  Print " Sollen die zur analytischen Funktionswertbestimmung benötigten "; n% + 1; " Stützstellen"
+  Print " bzw. x-Werte nach Wahl eingegeben oder berechnet werden ?  Bitte tippen Sie w"
+  Input " für Wahl oder b für Berechnung ein! ", c$
+  If c$ = "b"
+    Print
+    Print " Die Stützstellen können alternativ gleichabständig oder -zwecks Erzielung eines"
+    Print " besseren Approximationsergebnisses- als Nullstellen von Legendre- oder Tscheby-"
+    Print " scheffpolynomen ungleichabständig berechnet werden."
+    Input " Geben Sie bitte g für gleichabständig oder u für ungleichabständig ein! ", e$
+    h = xo - xu
+    If e$ = "g"
+      For i% = 0 To n%
+        xd(i%) = xu + i% * h / n% : x = xd(i%) : funktion : yd(i%) = y
+      Next i%
+    Else If e$ = "u"
+      Print
+      Print " Werden als Stützstellen die Nullstellen des Legendre- oder des Tschebyscheff-"
+      Input " polynoms gewünscht ? Bitte zur Auswahl ein l oder t eingeben! ", d$
+      If d$ = "l"
+        legendre
+      Else
+        tschebyscheff
+      EndIf
+      For i% = 0 To n%
+        xd(i%) = xu + h * vd(i%) : x = xd(i%) : funktion :  yd(i%) = y
+      Next i%
+    EndIf
+  EndIf
+  If c$ = "w"
+    For i% = 0 To n%
+      If i% < 10
+        Print " x"; i%; " = "
+      Else
+        Print " x"; i%; "= "
+      EndIf
+      Locate 6, CrsLin - 1 : Input xd(i%)
+      x = xd(i%) : funktion : yd(i%) = y
+    Next i%
+  EndIf
+EndIf
+newton
+Cls
+Print " Berechnungsergebnisse:"
+Print
+Print " Das Newtonsche Approximationspolynom vom n. Grade hat die allgemeine Form"
+Print " p(x) = k0+k1*(x-x0)+k2*(x-x0)*(x-x1)+....+kn*(x-x0)*(x-x1)*....*(x-x(n-1))"
+Print " Für den relevanten Fall mit n="; n%; " ergeben sich die Faktoren k0 bis k"; n%; " zu"
+For i% = 0 To n%
+  If i% < 10
+    Print " k"; i%; " = "; Round(k(i%), 12)
+  Else
+    Print " k"; i%; "= "; Round(k(i%), 12)
+  EndIf
+Next i%
+Print
+Print " Soll das Newtonpolynom in eine ganzrationale Funktion der Form"
+Input " p(x) = c0+c1*x+c2*x^2+c3*x^3+.....+cn*x^n umgewandelt werden, j/n ? ", d$
+If d$ = "j"
+  ganzrational
+  Print " Die Koeffizienten c0, c1, c2,....,cn dieser Funktion sind:"
+  For i% = 0 To n%
+    If i% < 10
+      Print " c"; i%; " = "; Round(c(i%), 12)
+    Else
+      Print " c"; i%; "= "; Round(c(i%), 12)
+    EndIf
+  Next i%
+EndIf
+Print
+If a$ = "a"
+  Print " Sollen die zu approximierende Funktion y(x) und das Approximationspolynom"
+  Print " p(x) zum Vergleich für äquidistante Argumente (x-Werte) im Approximations-"
+  Input " intervall berechnet und ausgegeben werden, j/n ? ", e$
+  If e$ = "j" Or e$ = "ja"
+    Input " Welcher Teilungsabstand für x wird gewünscht ? ", s
+    Print
+    Print "         x=            y(x)=             p(x)="
+    For x = xu To xo + s / 2 Step s
+      funktion
+      p = 0
+      For i% = n% DownTo 0
+        p = k(i%) + p * (x - xd(i%))
+      Next i%
+      Print Using("     ####,##-     ######,######-     ######,######-", x, y, p)
+    Next x
+  Else
+    Print
+    Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  EndIf
+Else If a$ = "n"
+  Print " Soll der Funktionsverlauf des Approximationspolynoms im Approximationsintervall"
+  Input " berechnet und numerisch ausgegeben werden, j/n ? ", e$
+  If e$ = "j" Or e$ = "ja"
+    Input " Welcher Teilungsabstand für x wird gewünscht ? ", s
+    Print "         x=            p(x)="
+    For x = xu To xo + s / 2 Step s
+      p = 0
+      For i% = n% DownTo 0
+        p = k(i%) + p * (x - xd(i%))
+      Next i%
+      Print Using("     ####,##-     ######,######-", x, p)
+    Next x
+  Else
+    Print
+    Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  EndIf
+EndIf
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+Sub newton
+  For j% = 0 To n%
+    u(j%, 0) = yd(j%)
+    For i% = 1 To j%
+      u(j%, i%) = (u(j%, i% - 1) - u(j% - 1, i% - 1)) / (xd(j%) - xd(j% - i%))
+    Next i%
+    k(j%) = u(j%, j%)
+    If k(j%) == 0 Then k(j%) = 0
+  Next j%
+Return
+Sub ganzrational
+  c(n%) = k(n%) : r% = 0
+  For i% = n% - 1 DownTo 0
+    q(i%, n%) = k(n%) : q(n%, i%) = k(i%)
+  Next i%
+  For i% = n% - 1 DownTo 0
+    For j% = n% - 1 DownTo r%
+      q(i%, j%) = q(i% + 1, j%) - xd(j% - r%) * q(i%, j% + 1)
+    Next j%
+    c(r%) = q(i%, j% + 1)
+    If c(r%) == 0 Then c(r%) = 0
+    Inc r%
+  Next i%
+Return
+Sub legendre
+  m% = n% + 1 : kb(0) = 1 : kc(0) = 0 : kc(1) = 1 : t% = Int(m% / 2)
+  For j% = 1 To n%
+    a = 2 - 1 / (j% + 1) : ka(0) = 0
+    For i% = 0 To j%
+      ka(i% + 1) = a * kc(i%)
+    Next i%
+    For i% = 0 To j% - 1
+      Sub ka(i%), (a - 1) * kb(i%) : kb(i%) = kc(i%)
+    Next i%
+    kb(j%) = kc(j%)
+    For i% = 0 To j% + 1
+      kc(i%) = ka(i%)
+    Next i%
+  Next j%
+  v = 0 : ve = 1.1 : s = 0.25 / m%
+  If Mod(m%, 2) Then vd(t%) = 0.5 : Inc t% : Add v, s / 10
+  Do
+    horner
+    Repeat
+      v0 = v : f0 = f : Add v, s : horner
+    Until Sgn(f) <> Sgn(f0) Or v > ve
+    Exit If v > ve
+    While Abs(f1 - f0) > 10 ^ -14
+      v1 = v : f1 = f : v = v1 - f1 * (v1 - v0) / (f1 - f0)
+      horner : v0 = v1 : f0 = f1
+    Wend
+    vd(t%) = 0.5 * (1 + v) : Inc t% : vd(m% - t%) = 0.5 * (1 - v) : Add v, s / 10
+  Loop
+'##E#
+Return
+Sub horner
+  f = ka(m%)
+  For i% = n% DownTo 0
+    f = f * v + ka(i%)
+  Next i%
+Return
+Sub tschebyscheff
+  For i% = 0 To n%
+    vd(i%) = 0.5 * (1 - Cos(PI * (i% + 0.5) / (n% + 1)))
+  Next i%
+Return
+Sub funktion                         'In diese Subroutine y=y(x) eingeben!
+  Rem y = Exp(x)
+  y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = 1 / (1 + x ^ 2)
+Return

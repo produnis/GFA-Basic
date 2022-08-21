@@ -1,0 +1,63 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, j, n, r, z : Global Double  kn
+
+Print
+Print "    Approximation einer Folge von Punkten mit gegebenen x-y-Koordinaten"
+Print "                   durch eine Polynomfunktion nach Newton"
+Print "    *******************************************************************"
+Print
+Input " Wie viele Punkte 2<=n<=20 sollen durch ein Polynom approximiert werden ? ";z
+n = z - 1 : Dim c(n), k(n), q(n, n), u(n, n), x(n), y(n) As Double
+Print
+Print " Bitte geben Sie gemäß folgendem Aufruf für jeden der vorhandenen "; z; " Punkte"
+Print " die x- und y-Koordinate ein!"
+For i = 0 To n
+  Print " x"; i + 1; "  = "
+  Locate 9, CrsLin - 1 : Input x(i)
+  Locate 20, CrsLin - 1 : Print "y"; i + 1; "  = "
+  Locate 27, CrsLin - 1 : Input y(i)
+'##E#
+Next i
+NEWTONFORM : NORMALFORM : Print
+
+Print " Ergebnis"
+Print " Hinweis zum Ergebnis: Das Programm berechnet die Koeffizienten 'k' für ein"
+Print " Polynom der Form:"
+Print " f(x) = k0+k1*x+k2*x^2+k3*x^3+.....+kn*x^n."
+Print
+Print " Das im vorliegenden Fall gesuchte Polynom ist vom " ; n; ". Grade und hat die"
+Print " Koeffizienten:"
+
+For i = 0 To n
+  Print " k"; i; "  =  "; Round(c(i), 12)
+Next i
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub NEWTONFORM
+  For j = 0 To n
+    u(j, 0) = y(j)
+    For i = 1 To j
+      u(j, i) = (u(j, i - 1) - u(j - 1, i - 1)) / (x(j) - x(j - i))
+    Next i
+    k(j) = u(j, j)
+    If k(j) == 0 Then k(j) = 0
+  Next j
+Return
+
+Sub NORMALFORM
+  c(n) = k(n) : r = 0
+  For i = n - 1 DownTo 0
+    q(i, n) = k(n) : q(n, i) = k(i)
+  Next i
+  For i = n - 1 DownTo 0
+    For j = n - 1 DownTo r
+      q(i, j) = q(i + 1, j) - x(j - r) * q(i, j + 1)
+    Next j
+    c(r) = q(i, j + 1)
+    If c(r) == 0 Then c(r) = 0
+    Inc r
+  Next i
+Return

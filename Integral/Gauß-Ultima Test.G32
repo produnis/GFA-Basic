@@ -1,0 +1,100 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, h, x, x0, xo, xu, y, ys : Global Int32 i, j, k, n
+Dim s(9), xn(16), g(16) As Double : Global m!, f$ : e = 10 ^ -12
+Print
+Print " Numerische Berechnung bestimmter Integrale von Funktionen y=f(x) nach Gauß/Legendre"
+Print "            mit 32 Stützstellen je Teilsegment des Integrationsintervalls"
+Print "                (Infos zum Programm unter 'josef-wienand@online.de')"
+Print " ***********************************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits ins Programm eingegeben?"
+Input " Tippen Sie hier bitte ein j für ja oder ein n für nein ein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Beenden Sie jetzt den Programmablauf durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub integrand' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals = ? ";xu
+Input " Obere  Grenze des Integrals = ? ";xo
+Print : Print " Ergebnis:"
+
+xn(1)  = 0.0483076656877383162348125704405 :  g(1)  = 0.0965400885147278005667648300636
+xn(2)  = 0.144471961582796493485186373599  :  g(2)  = 0.0956387200792748594190820022041
+xn(3)  = 0.239287362252137074544603209166  :  g(3)  = 0.0938443990808045656391802376681
+xn(4)  = 0.331868602282127649779916805730  :  g(4)  = 0.0911738786957638847128685771116
+xn(5)  = 0.421351276130635345364119436172  :  g(5)  = 0.0876520930044038111427714627518
+xn(6)  = 0.506899908932229390023747474378  :  g(6)  = 0.0833119242269467552221990746043
+xn(7)  = 0.587715757240762329040745476402  :  g(7)  = 0.0781938957870703064717409188283
+xn(8)  = 0.663044266930215200975115168663  :  g(8)  = 0.0723457941088485062253993564785
+xn(9)  = 0.732182118740289680387426665091  :  g(9)  = 0.0658222227763618468376500637069
+xn(10) = 0.794483795967942406963097298970  :  g(10) = 0.0586840934785355471452836373002
+xn(11) = 0.849367613732569970133693004968  :  g(11) = 0.0509980592623761761961632446895
+xn(12) = 0.896321155766052123965307243719  :  g(12) = 0.0428358980222266806568786466061
+xn(13) = 0.934906075937739689170919134835  :  g(13) = 0.0342738629130214331026877322524
+xn(14) = 0.964762255587506430773811928118  :  g(14) = 0.0253920653092620594557525897892
+xn(15) = 0.985611511545268335400175044631  :  g(15) = 0.0162743947309056706051705622064
+xn(16) = 0.997263861849481563544981128665  :  g(16) = 0.0070186100094700966004070637389
+
+For k = 1 To 8
+  n = 10 ^ (k - 1)              'n = Anzahl der Teilintervalle
+  h = (xo - xu) / (2 * n)       'h = halbe Breite eines Teilintervalls
+  ys = 0
+  For i = 1 To n
+    x0 = xu + h * (2 * i - 1)   'x0 = Mitte eines Teilintervalls
+    For j = 1 To 16
+      x = x0 + h * xn(j)        'h*xn(j) = +Abstand von der Mitte eines Teilintervalls
+      integrand
+      Add ys, g(j) * y
+      x = x0 - h * xn(j)        'h*xn(j) = -Abstand von der Mitte eines Teilintervalls
+      integrand
+      Add ys, g(j) * y
+    Next j
+  Next i
+  s(k) = ys * h : Print " s"; k; "="; s(k)
+
+  If k <= 8
+    If Abs(s(k) - s(k - 1)) < e
+      Print " Integralwert = "; Round(s(k), 12)
+      Print
+      Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+  EndIf
+Next k
+
+If k > 8
+  k = 9 : Mul n, 2
+  h = (xo - xu) / (2 * n)
+  ys = 0
+  For i = 1 To n
+    x0 = xu + h * (2 * i - 1)
+    For j = 1 To 16
+      x = x0 + h * xn(j)
+      integrand
+      Add ys, g(j) * y
+      x = x0 - h * xn(j)
+      integrand
+      Add ys, g(j) * y
+    Next j
+  Next i
+  s(k) = ys * h
+'##E#
+  Print " s"; k; "="; s(k)
+EndIf
+Print
+Print " Integralwert = "; Round(s(k), 12)
+Print
+Print " Achtung! Der Programmablauf wurde nach einer vorgegebenen Grenzanzahl von Iterationen"
+Print "          abgebrochen. Bitte überprüfen Sie deshalb das Ergebnis auf Brauchbarkeit."
+Print : Print " ENDE     Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub integrand                       'In diese Subroutine y=f(x) eingeben!
+  Rem y = Exp(-x ^ 2 / 2) / Sqr(2 * PI)
+  Rem y = 2 * Sqr(1 - x ^ 2)
+  Rem y = x * Exp(x) / (x + 1) ^ 2
+  y = 1 / x
+Return

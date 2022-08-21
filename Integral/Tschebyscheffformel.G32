@@ -1,0 +1,62 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double dx, e, g, h, x, x0, xo, xu, y, ys, z, zmax : zmax = 9 : e = 10 ^ -10
+Global Int32 i, j, n, f$ : Dim k(4), w(zmax) As Double
+Print
+Print " Numerische Berechnung bestimmter Integrale von Funktionen  y=f(x) nach Tschebyscheff"
+Print " mit neun nichtäquidistanten Stützstellen konstanten Gewichts pro Integrationssegment"
+Print "                            ohne Konvergenzbeschleunigung"
+Print " ************************************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits in den Programmcode eingesetzt?"
+Input " Tippen Sie hier bitte ein 'j' für ja oder ein 'n' für nein ein! ";f$
+Print
+If f$ <> "j"
+  Print " Bitte beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub INTEGRAND' ein"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals ? ";xu
+Input " Obere  Grenze des Integrals ? ";xo
+Print
+Print " Ergebnis:"
+
+k(1) = 0.167906184214805         'Stützstellen
+k(2) = 0.528761783057879
+k(3) = 0.601018655380239
+k(4) = 0.911589307728434
+g = 2 / 9                        'konstantes Gewicht
+
+For z = 1 To zmax
+  n = 10 ^ (z - 1)
+  h = (xo - xu) / (2 * n)
+  ys = 0
+  For i = 1 To n
+    x0 = xu + h * (2 * i - 1) : x = x0 : INTEGRAND
+    Add ys, y
+    For j = 1 To 4
+      dx = k(j) * h
+      x = x0 + dx : INTEGRAND
+      Add ys, y : x = x0 - dx : INTEGRAND
+      Add ys, y
+    Next j
+  Next i
+  w(z) = g * h * ys
+  If Abs(w(z) - w(z - 1)) < e
+    Print " Integralwert = "; Round(w(z), 10)
+    Print
+    Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  Else If z = zmax
+    Print " Es konnte keine Lösung gefunden werden!"
+    Print
+    Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  EndIf
+Next z
+
+Sub INTEGRAND                         'In dieses Subroutine y=f(x) eingeben!
+  y = Exp(-x * x / 2) / Sqr(2 * PI)
+  Rem y = 1 / x
+Return

@@ -1,0 +1,64 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, n, v : Global Double e, s, x, x1, xe, xk, y, y0, y1, ys
+Dim x0(100) As Double : Global a$ : s = 0.01013 : e = 10 ^ -12
+Print
+Print " Berechnung der Einfachnullstellen (Schnittnullstellen) von Funktionen y=f(x) nach"
+Print " der Newtonmethode, unter Verwendung exakter Formeln für die Ableitungen  ys=f'(x)"
+Print " *********************************************************************************"
+Print
+Print " Wurden die zu untersuchende Funktion y=f(x) und deren Ableitungsfunktion ys=f'(x)"
+Print " bereits in den Programmcode eingesetzt?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", a$
+Print
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' und die Ableitung ys=f'(x) in das Unterprogramm 'Sub ABLEITUNG' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Mit welchem Wert von x soll die Nullstellensuche starten  ? ", x
+Input " Bei welchem Wert von x soll die Nullstellensuche enden    ? ", xe
+Sub x, 0.00013 : n = 0
+
+Do
+'##E#
+  FUNKTION
+  Repeat : y0 = y : Add x, s              'Suche nach Vorzeichenänderung von y
+    If x > xe + s
+      Print : Print " Ergebnis:"
+      If n = 0 : Print " Keine Nullstelle gefunden!"
+      Else If n = 1 : Print " Eine Nullstelle ist bei"
+        Print " x = "; Round(x0(1), 8)
+      Else : Print " Nullstellen sind bei"
+        For i = 1 To n
+          Print " x = "; Round(x0(i), 8)
+        Next i
+      EndIf
+      Print : Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    FUNKTION
+  Until Sgn(y) <> Sgn(y0)
+  xk = x : y1 = y : Sub x, s / 2 : FUNKTION
+  If Sgn(y) = Sgn(y1) And Abs(y) < Abs(y1) Or Sgn(y) = Sgn(y0) And Abs(y) < Abs(y0)
+    x = xk : y = y1
+    Repeat : ABLEITUNG
+      Sub x, y / ys : FUNKTION              'Newton-Iteration
+    Until Abs(y) < e
+    Inc n : x0(n) = x : Add x, s
+  Else : x = xk + s
+  EndIf
+Loop
+
+Sub FUNKTION                                'In diese Subroutine y=f(x) eingeben!
+  y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = x - Cos(x)
+  Rem y = 1 / x - 1
+Return
+
+Sub ABLEITUNG                               'In diese Subroutine ys=f'(x) eingeben!
+  ys = 4 * x ^ 3 - 30 * x ^ 2 + 70 * x - 50
+  Rem ys = 1 + Sin(x)
+  Rem ys = -1 / x ^ 2
+Return

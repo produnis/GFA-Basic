@@ -1,0 +1,21 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double h0, sk, dh, xp : Global Int32 n : Dim x(10000), h(10000)
+Print
+Print "                  Ein Zwergkäfer klettert auf einen Baum"
+Print "                  **************************************"
+Print
+
+h0 = 100 : dh = 0.2 : sk = 0.10 : h(0) = h0 : x(0) = 0
+Repeat
+  Inc n : Rem Print "h(n="; n; ")="; h(n) : Rem Stop
+  x(n) = (x(n - 1) + sk) * (1 + dh / h(n - 1)) : Rem Print "x(n="; n; ")="; x(n) :Stop
+'##E#
+  h(n) = h0 + n * dh : Rem Print "h(n="; n; ")="; h(n) : Stop
+  xp = x(n) + sk
+  If Int(n / 100) = n / 100 Then Print "n="; n : Print "xp="; xp
+
+Until xp > h(n)
+Print
+Print "n="; n; " Nächte" : Print "xp="; xp : Print "h="; h(n - 1); " Meter in "; n - 1; " Tagen"
+End

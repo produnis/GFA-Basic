@@ -1,0 +1,74 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double h, h0, q, s, x, xo, xu, xm, y, ya, ym
+Global Int32 i, j, k, n, r, t, t1, z : Global f$
+Print
+Print "   Numerische Ableitung stetiger Funktionen y=f(x) bis maximal zur 3. Ordnung"
+Print "   durch Bildung zentraler Differenzenquotienten mit Richardson-Extrapolation"
+Print "        (Verion mit maximal 6-stufiger Extrapolation ohne Fehlerabfrage)"
+Print "   **************************************************************************"
+Print
+Print " Wurde die Stammfunktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Tippen Sie hier bitte ein 'j' für ja oder ein 'n' für nein ein! "; f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Bitte geben Sie zuerst y=f(x) in das Unterprogramm 'Sub ABLEITUNG' ein!"
+  Print
+  Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print " Die wievielte Ableitung von y=f(x) wird gesucht?"
+Input " Bitte hier 1, 2 oder (höchstens) 3 eingeben! "; n
+While n > 3 Or n < 1
+  Print " Achtung: Falsche Eingabe für n; bitte korrigieren!"
+  Input " n = ";n
+Wend
+Print
+Print " Für welches Intervall von x soll die "; n; ". Ableitung von y=f(x) berechnet werden?"
+Input " Untere Intervallgrenze  xu   =? ";xu
+Input " Obere  Intervallgrenze  xo   =? ";xo
+Input " Ausgabe-Schrittweite Delta-x =? ";s
+Cls
+Print " Ergebnis:"
+Print " Die Stammfunktion y(x) und deren "; n; ". Ableitung y"; n; "(x) haben"
+Print " im vorgegebenen Intervall folgenden numerischen Verlauf:"
+Print
+
+Print Tab(8); "x="; Tab(29); "y(x)="; Tab(51); "y"; n; "(x)="
+r = n + 3 : Dim ys(r)                              'Extrapolationstiefe
+h0 = 10 ^ -(3 - n) : t1 = Int((xo - xu) / s)
+For t = 0 To t1
+  xm = xu + t * s : x = xm : FUNKTION
+  ym = y : h = h0 : ABLEITUNG : ys(1) = ya
+  For j = 2 To r
+    Div h, 2 : ABLEITUNG : ys(j) = ya : z = 4
+    For i = j - 1 DownTo 1
+      ys(i) = (ys(i + 1) * z - ys(i)) / (z - 1)    'Extrapolation
+      Mul z, 4
+    Next i
+  Next j
+  Print Format(xm, " * ######0.00") : Locate 20, CrsLin - 1 : Print Format(ym, " * ########0.000000")
+  Locate 42, CrsLin - 1 : Print Format(ys(1), " * ########0.000000")
+Next t
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub ABLEITUNG
+  q = 0
+  For k = 0 To n
+    x = xm + h * (n - 2 * k) : FUNKTION
+    Add q, (-1) ^ k * y * Combin(n, k)
+  Next k
+'##E#
+  ya = q / (2 * h) ^ n
+Return
+
+Sub FUNKTION                       'In diese Subroutine y=f(x) eingeben!
+  Rem y = Sin(x)
+  y = 3 * x ^ 3 + 2 * x ^ 2 + x + 1
+  Rem y=EXP(x)
+  Rem y=x^4-10*x^3+35*x^2-50*x+24
+  Rem y=(x-1)*(x-2)^2*(x-5)^3
+  Rem y=EXP(-x*x/2)/SQR(2*PI)
+Return

@@ -1,0 +1,46 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int64 d, j, k, o, og, p, u, ug, z : Global Int32 a, c, e, i, n
+Print
+Print "           Berechnung von Primzahlen nach der Siebmethode des Eratosthenes"
+Print "               (Intervallversion für 'optimierte' Speicherausnutzung)"
+Print "           ***************************************************************"
+Print
+Print " In welchem Intervall der natürlichen Zahlen sollen Primzahlen berechnet werden ?"
+Repeat
+  Input " Untere Intervallgrenze (natürliche Zahl >= 5)       = ";ug
+  Input " Obere Intervallgrenze (natürliche Zahl <=250000000) = ";og
+  If ug < 5 Or og > 250000000 Or ug >= og
+    Print " Die Eingaben passen nicht, bitte ändern!"
+  EndIf
+Until og > ug And ug >= 5 And og <= 250000000
+Print
+o = 3 + Mul(3, Div(Div(og, 2) - 3, 3))
+u = 2 + Mul(3, Div(Div(ug, 2) - 2, 3))
+a = 3 + Mul(3, Div(Sqr(Div(og, 2)) - 3, 3))
+Dim m!(o + Mul(2, a)) : c = 0 : e = 1
+For i = 2 To a
+'##E#
+  If Not m!(i)
+    p = Add(2 * i, 1)
+    If u < Square(p)
+      z = Mul(p, 5 + Mul(6, Div(p - 5, 6)))
+    Else
+      z = Mul(5, p) : d = Add(z, p)
+      Add z, Mul(d, Div(u - z, d))
+    EndIf
+    For j = Div(z, 2) To o Step 2 * p
+      m!(j) = True : Add j, p : m!(j) = True
+    Next j
+  EndIf
+  Add i, c : Swap c, e
+Next i
+For k = u To o Step 2
+  If Not m!(k) Then Inc n : Print " "; Add(2 * k, 1);
+  Inc k
+  If Not m!(k) Then Inc n : Print " "; Add(2 * k, 1);
+Next k
+Print
+Print " Der Zahlenbereich von "; 2 * u + 1; " bis "; 2 * o + 1; " enthält "; n; " Primzahlen"
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

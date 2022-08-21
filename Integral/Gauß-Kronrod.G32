@@ -1,0 +1,68 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double dx, e, h, x, x0, xo, xu, y, ys : Global Int32 i, j, k, n
+Dim s(9), xn(7), g(7) As Double : Global m!, f$ : e = 10 ^ -12
+Print
+Print " Numerische Berechnung bestimmter Integrale von Funktionen y=f(x) nach Gauß/Kronrod"
+'##E#
+Print "  mit 7 Gauß- und 8 Kronrod-Stützstellen je Teilsegment des Integrationsintervalls"
+Print " **********************************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits ins Programm eingegeben?"
+Input " Tippen Sie hier bitte ein j für ja oder ein n für nein ein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Beenden Sie jetzt den Programmablauf durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub integrand' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals = ? ";xu
+Input " Obere  Grenze des Integrals = ? ";xo
+Print : Print " Ergebnis:"
+
+xn(0) = 0                                   : g(0) = 0.209482141084727828012999174891714
+xn(1) = 0.207784955007898467600689403773245 : g(1) = 0.204432940075298892414161999234649
+xn(2) = 0.405845151377397166906606412076961 : g(2) = 0.190350578064785409913256402421014
+xn(3) = 0.586087235467691130294144838258730 : g(3) = 0.169004726639267902826583426598550
+xn(4) = 0.741531185599394439863864773280788 : g(4) = 0.140653259715525918745189590510238
+xn(5) = 0.864864423359769072789712788640926 : g(5) = 0.104790010322250183839876322541518
+xn(6) = 0.949107912342758524526189684047851 : g(6) = 0.063092092629978553290700663189204
+xn(7) = 0.991455371120812639206854697526329 : g(7) = 0.022935322010529224963732008058970
+
+For k = 1 To 9
+  n = 10 ^ (k - 1)                     'n = Anzahl der Teilintervalle
+  h = (xo - xu) / (2 * n)              'h = halbe Breite eines Teilintervalls
+  ys = 0
+  For i = 1 To n
+    x0 = xu + h * (2 * i - 1)          'x0 = Mitte eines Teilintervalls
+    x = x0 : integrand
+    Add ys, g(0) * y
+    For j = 1 To 7 : dx = h * xn(j)
+      x = x0 + dx : integrand          '+dx = +Abstand von der Mitte eines Teilintervalls
+      Add ys, g(j) * y
+      x = x0 - dx : integrand          '-dx = -Abstand von der Mitte eines Teilintervalls
+      Add ys, g(j) * y
+    Next j
+  Next i
+  s(k) = ys * h
+  If Abs(s(k) - s(k - 1)) < e
+    Print " Integralwert = "; Round(s(k), 12)
+    Print
+    Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+    Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+  EndIf
+Next k
+Print " Integralwert = "; Round(s(k - 1), 12)
+Print
+Print " Achtung! Der Programmablauf wurde nach einer vorgegebenen Grenzanzahl von Iterationen"
+Print "          abgebrochen. Bitte überprüfen Sie deshalb das Ergebnis auf Brauchbarkeit."
+Print : Print " ENDE     Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub integrand                       'In diese Subroutine y=f(x) eingeben!
+  Rem y = Exp(-x ^ 2 / 2) / Sqr(2 * PI)
+  Rem y = 2 * Sqr(1 - x ^ 2)
+  Rem y = x * Exp(x) / (x + 1) ^ 2
+  y = 1 / x
+Return

@@ -1,0 +1,73 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int64 i, m, n : Global Double d, e, g, s, x, x0, x1, xe, y, y0, yv : Global v$
+Print
+Print " Berechnung normierter Stützstellen und Gewichte für die numerische Integration"
+Print "        von Funktionen f(x) mit den Quadraturformeln nach Gauß/Legendre"
+Print "       (Anzahl der Stützstellen aus Genauigkeitsgründen auf 10 begrenzt)"
+Print " ******************************************************************************"
+Print
+Print " Wie viele Stützstellen, 1<=n<=10, werden pro Integrationsintervall gewünscht?"
+Input " n = ? ";n
+While n < 1 Or n > 10
+  Print " Bitte für n eine ganze Zahl >=1 und <=10 eingeben!"
+  Input " n = ";n
+Wend
+m = n - 1 : Dim k(Int(n / 2)), kv(Int(m / 2)) As Double
+
+For i = 0 To Int(n / 2)    'Explizite Berechnung der Koeffizienten des Legendre-Polynoms
+  k(i) = (-1) ^ i * Fact(2 * (n - i)) / (Fact(n - i) * Fact(n - 2 * i) * Fact(i) * 2 ^ n)
+Next i
+For i = 0 To Int(m / 2)    'Explizite Berechnung der Koeffizienten des Legendre-Vorpolynoms
+  kv(i) = (-1) ^ i * Fact(2 * (m - i)) / (Fact(m - i) * Fact(m - 2 * i) * Fact(i) * 2 ^ m)
+Next i
+Print
+
+Print " Koeffizienten des Legendre-Polynoms "; n; ". Grades"
+For i = 0 To Int(n / 2)         'Ausgabe der Koeffizienten des Legendre-Polynoms
+  Print " k(x^"; n - 2 * i; ") = "; Round(k(i), 15)
+Next i
+Print
+Print " Normierte Stützstellen 'x' und Gewichte 'g'"
+x = -0.00031 : xe = 1.1 : s = 0.11 / n : e = 10 ^ -16
+If Even(n) Then v$ = "+-" Else If Odd(n) Then v$ = "  "
+
+Do
+  POLYNOM
+  Repeat          'Suche nach Vorzeichenumkehr bei den Funktionswerten y des Legendre-Polynoms
+    x0 = x : POLYNOM
+    y0 = y : Add x, s
+    If x > xe
+      Print
+      Print " Anmerkung: Die normierten Stützstellen sind die Nullstellen des Legendre-Polynoms."
+      Print " ENDE       Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    POLYNOM
+'##E#
+  Until Sgn(y) <> Sgn(y0)
+  While Abs(y - y0) > e  'Berechnung der Nullstellen des Legendre-Polynoms durch Sekanteniteration
+    x1 = x : Sub x, y * (x - x0) / (y - y0)
+    x0 = x1 : y0 = y : POLYNOM
+  Wend
+  VORPOLYNOM
+  g = 2 * (1 - x ^ 2) / (n * yv) ^ 2            'Formel für Berechnung der Gewichte
+  Print " x = "; v$; Using("##,##############", Abs(x))
+  Locate 32, CrsLin - 1 : v$ = "+-"
+  Print " g ="; Using("##,##############", Abs(g))
+  Add x, 0.21 * s : POLYNOM
+Loop
+
+Sub POLYNOM                    'y = Funktionswert des Legendre-Polynoms
+  y = 0
+  For i = 0 To Int(n / 2)
+    Add y, k(i) * x ^ (n - 2 * i )
+  Next i
+Return
+
+Sub VORPOLYNOM                 'yv = Funktionswert des Legendre-Vorpolynoms
+  yv = 0
+  For i = 0 To Int(m / 2)
+    Add yv, kv(i) * x ^ (m - 2 * i)
+  Next i
+Return

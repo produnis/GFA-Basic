@@ -1,0 +1,64 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, s, x, xu, x1, xe, xk, xp, y, ya, yo, yu : Dim xn(100) As Double
+Global Int32 i, n : Global a$ : e = 10 ^ -14 : s = 0.01013
+Print
+Print "    Berechnung der Einfachnullstellen (Schnittnullstellen)von Funktionen y=f(x)"
+Print "                             nach dem Sekantenverfahren"
+Print "    ***************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", a$
+Print
+
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+
+Input " Mit welchem Wert von x soll die Nullstellensuche starten? ", x
+Input " Bei welchem Wert von x soll die Nullstellensuche enden  ? ", xe
+Sub x, 0.00013 : n = 0
+
+Do
+  FUNKTION
+  Repeat : xu = x : yu = y : Add x, s       'Suche nach Vorzeichenänderung von y
+    If x > xe + s
+      Print : Print " Ergebnis:"
+      If n = 0 :  Print " Keine Nullstelle gefunden!"
+'##E#
+      Else If n = 1 : Print " Eine Nullstelle ist bei"
+        Print " x = "; Round(xn(1), 10)
+      Else : Print " Nullstellen sind bei"
+        For i = 1 To n
+          Print " x = "; Round(xn(i), 10)
+        Next i
+      EndIf
+      Print : Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    FUNKTION
+  Until Sgn(y) <> Sgn(yu)
+  yo = y : xk = x : Sub x, s / 2 : FUNKTION
+  If Sgn(y) = Sgn(yu) And Abs(y) < Abs(yu) Or Sgn(y) = Sgn(yo) And Abs(y) < Abs(yo)
+    y = yo : x = xk
+    While Abs(x - xu) > e                   'Iteration nach der Sekantenregel
+      x1 = x :  Sub x, y * (x - xu) / (y - yu)
+      xu = x1 : yu = y : FUNKTION
+    Wend
+    Inc n : xn(n) = x : Add x, s
+  Else : x = xk + s
+  EndIf
+Loop
+
+Sub FUNKTION                'In diese Subroutine y=f(x) eingeben!
+  Rem y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = x ^ 7 + 4 * x ^ 6 - 54 * x ^ 5 - 160 * x ^ 4 + 641 * x ^ 3 + 828 * x ^ 2 - 1260 * x
+  Rem y = x ^ 6 + 4 * x ^ 5 - 54 * x ^ 4 - 160 * x ^ 3 + 641 * x ^ 2 + 828 * x - 1260
+  Rem y = 1 / x - 1
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) - 6
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) + 6
+  y = 1 / (x + 1) + 1 / (x + 2) + 1 / x + 1 / (x - 1) + 1 / (x - 2) + 1 / (x - 3) + 1 / (x - 4) - 4
+Return

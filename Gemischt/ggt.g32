@@ -1,0 +1,30 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 a, b, i, n, n$
+Print
+Print " Grˆﬂter gemeinsamer Teiler von n verschiedenen nat¸rlichen Zahlen"
+Print " *****************************************************************"
+Print
+Input " Von wie vielen nat¸rlichen Zahlen >=2 wird der ggT gesucht ? ", n
+Print
+Dim z(n) As Int32
+For i = 1 To n
+  Print " "; i; ". Zahl = "
+'##E#
+  Locate 12, CrsLin - 1 : Input z(i)
+Next i
+a = z(1)
+For i = 2 To n
+  b = z(i)
+  While b
+    Sub a, b * Int(a / b)
+    Exit If a = 0
+    Sub b, a * Int(b / a)
+  Wend
+  Add a, b
+Next i
+Print
+Print " Ergebnis:  Der ggT ist "; a
+Print
+Print " ENDE   Durch Schlieﬂen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

@@ -1,0 +1,36 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int64 g, j, n, o, p, z : Global Int32 a, c, e, i
+Print
+Print "         Berechnung von Primzahlen nach der Siebmethode des Eratosthenes"
+Print "              (Standardversion für 'optimierte' Speicherausnutzung)"
+Print "         ***************************************************************"
+Print
+Print " Bis zu welcher Grenzzahl g der natürlichen Zahlen im Bereich von 7 bis 500000000"
+Input " sollen Primzahlen berechnet werden? g = ", g
+Print
+o = 3 + Mul(3, Div(Div(g, 2) - 3, 3))
+a = 3 + Mul(3, Div(Sqr(Div(g, 2)) - 3, 3))
+Dim m!(o + 2 * a) : c = 0 : e = 1 : n = 2
+Print " 2 3";
+For i = 2 To a
+  If Not m!(i)
+    p = Add(2 * i, 1) : Inc n : Print " "; p;
+    z = Mul(p, 5 + Mul(6, Div(p - 5, 6)))
+'##E#
+    For j = Div(z, 2) To o Step 2 * p
+      m!(j) = True
+      Add j, p
+      m!(j) = True
+    Next j
+  EndIf
+  Add i, c : Swap c, e
+Next i
+For j = i To o
+  If Not m!(j) Then Inc n : Print " "; Add(2 * j, 1);
+  Add j, c : Swap c, e
+Next j
+Print
+Print " Der Zahlenbereich von  2  bis "; 2 * o + 1; " enthält "; n; " Primzahlen."
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

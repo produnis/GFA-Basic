@@ -1,0 +1,101 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, j, k, n, r, t, z : Global f$ : r = 22 : Dim s(r) As Double
+Global Double e, h, h0, k1, x, x0, xa, xe, y, y0, y1, ys : e = 10 ^ -14
+Print
+Print "   Lösung von Anfangswertaufgaben gewöhnlicher Differentialgleichungen 1. Ordnung"
+Print "       nach einem Algorithmus 3. Ordnung von Heun mit Richardson-Extrapolation"
+Print "   ******************************************************************************"
+Print
+Print " Haben Sie die Anleitungsinformation zu diesem Programm bereits gelesen und die zu"
+Print " lösende Differentialgleichung in den Quellcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ";f$
+
+If f$ <> "j" And f$ <> "ja"
+  Cls
+  Print " Anleitung für die Eingabe der zu lösenden DG in den Qellcode dieses Programms"
+  Print " *****************************************************************************"
+  Print
+  Print " Die zu lösende Differentialgleichung darf nicht von höherer als erster Ordnung"
+  Print " sein und muss für die Einbindung in den Quellcode dieses Programms in die Form"
+  Print
+  Print " y1 = f(x,y)"
+  Print
+  Print " entwickelt werden. Darin bezeichnen: y die gesuchte Stammfunktion, y1 deren"
+  Print " erste Ableitung und x die unabhängige Variable."
+  Print
+  Print " ANMERKUNG: Im einfachsten Fall hat eine DG 1. Ordnung die Form:  y1 = f(x),"
+  Print " wobei f(x) auch eine Konstante sein kann. Die Stammfunktion y ergibt sich dann"
+  Print " einfach als Integral von f(x) plus Integrationskonstante."
+  Print
+  Print " Geben Sie nun bitte nach Schließen dieses Fensters die aktuell zu lösende DG"
+  Print " in der vorgeschriebenen Form in das Unterprogramm DIFFGLEI des Quellcodes ein"
+  Print " und starten Sie danach die Anwendung neu!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print
+
+Input " Mit welchem Wert von x soll die Berechnung starten  ? ", xa
+Input " Wie groß ist der zugehörige Anfangswert von y       ? ", y0
+Input " Bei welchem Wert von x soll die Berechnung enden    ? ", xe
+Print " Mit welchem Delta-x soll bezüglich der Ausgabe von"
+Input " Werten für y und y1 fortgeschritten werden          ? ", h0
+Cls
+Print " Ergebnis: Die Stammfunktion y(x) und deren 1. Ableitung y1=y'(x)"
+Print " haben im vorgegebenen Intervall folgenden numerischen Verlauf:"
+Print
+
+x = xa : y = y0
+DIFFGLEI
+Print Tab(8); "x="; Tab(27); "y(x)="; Tab(51); "y1=y'(x)="
+Print Format(x, " * #####0.00"), Format(y, "   * ########0.00000000"), Format(y1, "* ########0.00000000")
+t = (xe - xa) / h0
+For j = 0 To t - 1
+  x0 = xa + j * h0                     'alternativ: x0=x  (mit größerem Fehler)
+  n = 1 : h = h0 / 3
+  HEUN
+  s(1) = ys
+  For k = 2 To r
+    Mul n, 2 : Mul h, 0.5
+    HEUN
+    s(k) = ys
+    z = 8
+    For i = k - 1 DownTo 1              'Richardson/Romberg-Extrapolation
+      s(i) = (s(i + 1) * z - s(i)) / (z - 1)
+      Mul z, 2
+    Next i
+    If Abs(s(2) - s(1)) <= e * Abs(s(1))
+      y0 = s(1) : y = y0
+      DIFFGLEI
+      Print Format(x, " * #####0.00"), Format(y, "   * ########0.00000000"), Format(y1, "* ########0.00000000")
+      k = r
+    Else If k = r
+      Print
+      Print " Es konnten keine weiteren Ergebnisse berechnet werden!"
+      j = t
+    EndIf
+'##E#
+  Next k
+Next j
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub HEUN
+  x = x0 : ys = y0
+  For i = 1 To n
+    y = ys
+    DIFFGLEI
+    k1 = y1 : Add y, h * y1 : Add x, h
+    DIFFGLEI
+    y = ys + 2 * h * y1 : Add x, h
+    DIFFGLEI
+    x = x0 + 3 * i * h                  'alternativ: ADD x,h  (mit größerem Fehler)
+    Add ys, 0.75 * h * (k1 + 3 * y1)
+  Next i
+Return
+
+Sub DIFFGLEI                   'In diese Subroutine die D.-Gleichung y1=f(x,y) eingeben!
+  Rem y1 = x + y
+  y1 = x ^ 2 + 2 * x - 8
+Return

@@ -1,0 +1,30 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, n, u, v : Global Int64 j, k, q, z
+Print
+Print "      Berechnung einer bestimmten Anzahl n der ersten Primzahlen p"
+Print "      durch  Prüfung der Kandidaten k auf Nichtübereinstimmung mit"
+Print "            ganzzahligen Vielfachen von Primzahlen p<=sqr(k)"
+Print "      ************************************************************"
+Print
+Input " Welche Anzahl 2<=n<=10^9 der ersten Primzahlen soll berechnet werden? ", n
+Print
+Dim p(n), w(Sqr(n)) As Int64
+k = 1 : z = 3 : u = 4 : v = 2 : q = 25
+Print " 2 3";
+For i = 3 To n
+  Repeat           'Vielfache von 2 und 3 werden bei den Kandidaten k übersprungen
+    Add k, u
+    If q <= k Then  w(z) = q : Inc z :  q = Square(p(z))
+    For j = 3 To z - 1
+      If w(j) < k Then Add w(j), p(j)
+      Exit If w(j) = k
+    Next j
+    Swap u, v
+  Until j = z
+'##E#
+  p(i) = k : Print " "; k;
+Next i
+Print
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

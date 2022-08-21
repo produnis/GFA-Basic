@@ -1,0 +1,180 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Long i, j, k, n, m, p, r, t, u, v, z : Global f$
+Global Double e, h, h0, x, xa, xe, x0, y0, y1, y2, y3
+e = 10 ^ -14 : r = 22 : Dim a(4, r), y(4), ys(4) As Double
+Print
+Print "   Numerische Lösung von Anfangswertaufgaben gewöhnlicher Differentialgleichungen"
+Print "    bis zur vierten Ordnung nach dem Eulerverfahren mit Richardson-Extrapolation"
+Print "   ******************************************************************************"
+Print
+Print " Haben Sie die Anleitungsinformation zu diesem Programm bereits gelesen und die zu"
+Print " lösende Differentialgleichung in den Quellcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ";f$
+
+If f$ <> "j" And f$ <> "ja"
+  Cls
+  Print " Anleitung für die Eingabe der zu lösenden DG in den Qellcode dieses Programms"
+  Print " *****************************************************************************"
+  Print " Für die Eingabe in die Subroutine DIFFGLEI des Quellcodes muss die zu lösende"
+  Print " Differentialgleichung in die Form"
+  Print
+  Print " y(n) = f(x,y0,y1,y2,....)"
+  Print
+  Print " entwickelt werden. Darin bezeichnen: y(n) die höchste auftretende Ableitung,"
+  Print " x die unabhängige Variable, y0 die gesuchte Stammfunktion, y1 die erste"
+  Print " auftretende Ableitung, y2 die 2. auftretende Ableitung und so weiter."
+  Print
+  Print " Beispiel: Gegeben sei die DG 3. Ordnung:"
+  Print " 0.5*y3+3*cos(y2)+8*y1+5*sin(x*y0)-x*(1.5*x-2)-2.5 = 0"
+  Print
+  Print " Aufgelöst nach der höchsten Ableitung, hier also y3, wird daraus:"
+  Print " y3 = 5+x*(3*x-4)-10*sin(x*y0)-16*y1-6*cos(y2)"
+  Print
+  Print " Bei der Einbindung dieser Gleichungsform in die Subroutine DIFFGLEI ist noch"
+  Print " zu beachten, dass die Ordnungszahl n, hier n=3, eine Variable ist, die in eine"
+  Print " Klammer gesetzt werden muss. Die korrekte Eingabeform ist deshalb entweder:"
+  Print " y(3) = 5+x*(3*x-4)-10*sin(x*y0)-16*y1-6*cos(y2)"
+  Print
+  Print " oder, weil die Ordnungszahl n schon beim Start des Programms abgefragt wird:"
+  Print " y(n) = 5+x*(3*x-4)-10*sin(x*y0)-16*y1-6*cos(y2)"
+  Print
+  Print " ANMERKUNG: Eine DG 1. Ordnung hat im einfachsten Fall die Form  y(1) = f(x),"
+  Print " wobei f(x) auch eine Konstante sein kann, Die Stammfunktion y0 ist dann das"
+  Print " Integral von f(x) plus der zu berücksichtigenden Integrationskonstanten"
+  Print
+  Print " ENDE DER INFO"
+  Print
+  Print " Geben Sie nun bitte nach Schließen dieses Fensters die aktuell zu lösende DG"
+  Print " in der vorgeschriebenen Form in das Unterprogramm DIFFGLEI des Quellcodes ein"
+  Print " und starten Sie danach die Anwendung neu!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print
+
+Print " Von welcher Ordnung ist die zu lösende Differentialgleichung, das heißt,"
+Input " von welchem Grad  1<=n<=4  ist die höchste darin vorkommende Ableitung? ";n
+While n < 1 Or n > 4
+  Print " Achtung: Die Ordnungszahl n muss ganzzahlig >=1 und <=4 sein!"
+  Input " n = ";n
+Wend
+Print
+Input " Welchen Startwert hat die Variable x ? ";xa
+Input " Welchen  Endwert  hat die Variable x ? ";xe
+Print " Welche Schrittweite Delta-x wird für"
+Input " die Funktionswertausgabe gewünscht   ? ";h0
+Print
+
+Input " Welchen Anfangswert hat die Stammfunktion y0 ? "; y0
+y(0) = y0 : a(0, 1) = y(0) : ys(0) = y(0)
+If n = 2
+  Input " Welchen Anfangswert hat die 1. Ableitung  y1 ? "; y1
+  y(1) = y1 : a(1, 1) = y(1) : ys(1) = y(1)
+ElseIf n = 3
+  Input " Welchen Anfangswert hat die 1. Ableitung  y1 ? "; y1
+  y(1) = y1 : a(1, 1) = y(1) : ys(1) = y(1)
+  Input " Welchen Anfangswert hat die 2. Ableitung  y2 ? "; y2
+  y(2) = y2 : a(2, 1) = y(2) : ys(2) = y(2)
+ElseIf n = 4
+  Input " Welchen Anfangswert hat die 1. Ableitung  y1 ? "; y1
+  y(1) = y1 : a(1, 1) = y(1) : ys(1) = y(1)
+  Input " Welchen Anfangswert hat die 2. Ableitung  y2 ? "; y2
+  y(2) = y2 : a(2, 1) = y(2) : ys(2) = y(2)
+  Input " Welchen Anfangswert hat die 3. Ableitung  y3 ? "; y3
+  y(3) = y3 : a(3, 1) = y(3) : ys(3) = y(3)
+EndIf
+Cls
+
+If n = 1
+  Print " Ergebnis: Die Stammfunktion y0(x) und deren 1. Ableitung y1(x)"
+Else
+  Print " Ergebnis: Die Stammfunktion y0(x) und deren Ableitungen bis zur "; n; ". Ordnung"
+EndIf
+Print " haben im vorgegebenen Intervall von x folgenden numerischen Verlauf:"
+Print
+
+x = xa
+ZUORDNUNG
+Locate 9, 4 : Print "x = "                            // Ausgabe der Anfangswerte
+Locate 3, 5 : Print Format(xa, " * ####0.000")
+For i = 0 To n
+  Locate 26 + 22 * i, 4 : Print "y"; i; "(x)="
+  Locate 18 + 22 * i, CrsLin : Print Format(y(i), " * ######0.00000000")
+Next i
+
+t = (xe - xa) / h0
+For u = 0 To t - 1
+  x0 = xa + u * h0 : p = 1 : h = h0 : a(n, 1) = y(n)  // Berechnung des 1. Eulerwertes
+  For i = 0 To n - 1
+    Add a(i, 1), h * a(i + 1, 1)
+  Next i
+  Print
+'##E#
+  For k = 2 To r                                      // Berechnug weiterer Eulerwerte
+    x = x0 : Mul p, 2 : Mul h, 0.5                    // mit halbierter Schrittweite
+    For i = 0 To n - 1
+      a(i, k) = ys(i)
+    Next i
+    For j = 1 To p
+      For i = 0 To n - 1
+        y(i) = a(i, k)
+      Next i
+      ZUORDNUNG
+      a(n, k) = y(n)
+      For i = 0 To n - 1
+        Add a(i, k), h * a(i + 1, k)
+      Next i
+      x = x0 + j * h
+    Next j
+    z = 2
+    For j = k - 1 DownTo 1                            // Richardson/Romberg-Extrapolation
+      For i = 0 To n - 1
+        a(i, j) = (a(i, j + 1) * z - a(i, j)) / (z - 1)
+      Next i
+      Mul z, 2
+    Next j
+
+    v = 0
+    For i = 0 To n - 1                                // Fehlerabfrage
+      Add v, Sgn(e * Abs(a(i, 1)) - Abs(a(i, 1) - a(i, 2)))
+    Next i
+
+    If v = n
+      For i = 0 To n - 1                              // Festlegung der Anfangsbedingungen
+        y(i) = a(i, 1) : ys(i) = y(i)                 // für den nächsten Berechnungsschritt
+      Next i
+      ZUORDNUNG
+      Locate 3, CrsLin - 1 : Print Format(x0 + h0, " * ####0.000")  // Ergebnisausgabe
+      For i = 0 To n
+        Locate 18 + 22 * i, CrsLin - 1 : Print Format(y(i), " * ######0.00000000")
+      Next i
+      k = r
+    ElseIf k = r
+      Print " Weitere Ergebnisse konnten nicht berechnet werden! Durch Festlegung eines größeren"
+      Print " Wertes für die im Programm unter dem Variablennamen e gespeicherte Fehlertoleranz"
+      Print " lässt sich dieses Problem eventuell beheben."
+      u = t
+    EndIf
+  Next k
+Next u
+Print
+Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+
+Sub ZUORDNUNG
+  y0 = y(0) : y1 = y(1) : y2 = y(2) : y3 = y(3)
+  DIFFGLEI
+
+Sub DIFFGLEI                                 //In diese Subroutine die zu lösende D.-Gleichung eingeben
+  Rem y(n) = 5 + x * (3 * x - 4) - 10 * Sin(x * y0) - 16 * y1 - 6 * Cos(y2) // Beispiel aus Info
+  Rem y(n) = 58.3775 / y1 - 0.00045 * (y1) ^ 2 - 0.14715                    // Beschleunigen auf waagerechter Straße
+  Rem y(n) = -0.00045 * (y1) ^ 2 - 7.01415                                  // Bremsen auf waagerechter Straße
+  Rem y(n) = -.00045 * (y1) ^ 2 - 6.003208624                               // Bremsen auf Straße mit Gefälle
+  Rem y(n) = (y0) ^ 2 / x
+  Rem y(n) = Exp(-x ^ 2 / 2) / Sqr(2 * PI)
+  Rem y(n) = y0 / x - Exp(y0 / x) - 2
+  Rem y(n) = 0.02 * x ^ 2 * Exp(-0.1 * x)
+  Rem y(n) = x + y0 + y1 + y2 + y3
+  Rem y(n) = x ^ 2
+  Rem y(n) = 1
+  y(n) = x + y0

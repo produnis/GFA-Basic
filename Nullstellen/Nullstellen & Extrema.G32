@@ -1,0 +1,260 @@
+'##E#
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double ab, ab1, di, dx, f, f1, f2, fu, fm, h, j, k, q, s, sk, x, xa, xe, xo
+Global Double x1, x2, xj, xk, xu, y, y1, y2, yj, ym, yu, ye, w : Dim xw(3) As Double
+Global Int32 ex, i, n, nu, v, z : Global null!, pol!, f$, x$, y$
+Print
+Print " Berechnung aller reellen Nullstellen und lokalen Extrema von  Funktionen y=f(x) durch"
+Print " Suche nach Vorzeichenwechseln von Differenzwerten der Betragsfunktionen ABS(f(x)) mit"
+Print " Intervallschachtelung nach dem  Goldenen Schnitt und Bestimmung  der Vielfachheit der"
+Print "       Mehrfachnullstellen sowie der Nullstellen-Vielfachwertigkeit der Extrema."
+Print " *************************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", f$
+Print
+
+If f$ <> "j" And f$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Print " In welchem Intervall von x werden Nullstellen oder Extrema von f(x) vermutet?"
+Input " Untere Intervallgrenze ? ", xa
+Input " Obere  Intervallgrenze ? ", xe
+Print : Print " Ergebnis:"
+k = 1.5 - Sqr(1.25)                    'Teilungsfaktor nach dem Goldenen Schnitt
+s = 0.01013 : Sub xa, 0.00013
+x = xa : nu = 0 : ex = 0 : null! = True
+
+Do
+  FUNKTION : VORZEICHEN
+  fu = f : Add x, s
+  FUNKTION : VORZEICHEN
+  fm = f : Add x, s
+  FUNKTION : VORZEICHEN
+  While Sgn(fu - fm) - Sgn(fm - f) < 2
+    fu = fm : fm = f : Add x, s
+    If x > xe + s
+      If nu = 0
+        Print " Keine Nullstelle innerhalb des Intervalls gefunden!"
+      EndIf
+      null! = False : EXTREMA
+    EndIf
+    FUNKTION : VORZEICHEN
+  Wend
+  xu = x - 2 * s : xo = x : h = 2 * s * k : x = xu + h
+  FUNKTION : VORZEICHEN
+  x1 = x : f1 = f : x = xo - h
+  FUNKTION : VORZEICHEN
+  x2 = x : f2 = f
+  While Abs(f1 - f2) > 10 ^ -12 And pol! = False
+    If f1 > f2
+      f1 = f2 : xu = x1 : x1 = x2 : x = xo - k * (xo - xu)
+      Exit If Abs(x) < 10 ^ -12
+      FUNKTION : VORZEICHEN
+      If f > 10 ^ 2 Then pol! = True   'Erkennung von Polstellen
+      x2 = x : f2 = f
+    Else
+      f2 = f1 : xo = x2 : x2 = x1 : x = xu + k * (xo - xu)
+      Exit If Abs(x) < 10 ^ -12
+      FUNKTION : VORZEICHEN
+      If f > 10 ^ 2 Then pol! = True   'Erkennung von Polstellen
+      x1 = x : f1 = f
+    EndIf
+  Wend
+  If pol! = False
+    x = 0.5 * (xu + xo)
+    FUNKTION : VORZEICHEN
+    If f < 10 ^ -8                     'Prüfung auf Nullstelle
+      ye = 0 : VIELFACHHEIT
+      Print " "; j; "fach-Nullstelle bei   x = "; x$; Round(x, 4)
+      Inc nu
+    EndIf
+  EndIf
+  pol! = False
+  Add x, s
+Loop
+
+Sub EXTREMA
+  x = xa : Print
+  Do
+    FUNKTION : VORZEICHEN : yu = y : Add x, s
+    FUNKTION : VORZEICHEN : ym = y : Add x, s
+    FUNKTION : VORZEICHEN
+    While Sgn(yu - ym) = Sgn(ym - y)
+      yu = ym : ym = y : Add x, s
+      If x > xe + s
+        If ex = 0
+          Print " Kein lokales Extremum innerhalb des Intervalls gefunden!"
+        EndIf
+        Print
+        Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+        Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+      EndIf
+      FUNKTION : VORZEICHEN
+    Wend
+    v = Sgn(ym - y)
+    xu = x - 2 * s : xo = x : h = 2 * s * k : x = xu + h
+    FUNKTION : VORZEICHEN : x1 = x : y1 = y : x = xo - h
+    FUNKTION : VORZEICHEN : x2 = x : y2 = y
+    While Abs(y1 - y2) > 10 ^ -12 And pol! = False
+      If y1 > y2
+        y1 = y2 : xu = x1 : x1 = x2 : x = xo - k * (xo - xu)
+        Exit If Abs(x) < 10 ^ -12
+        FUNKTION : VORZEICHEN
+        If Abs(y) > 10 ^ 2 Then pol! = True      'Erkennung von Polstellen
+        x2 = x : y2 = y
+      Else
+        y2 = y1 : xo = x2 : x2 = x1 : x = xu + k * (xo - xu)
+        Exit If Abs(x) < 10 ^ -12
+        FUNKTION : VORZEICHEN
+        If Abs(y) > 10 ^ 2 Then pol! = True      'Erkennung von Polstellen
+        x1 = x : y1 = y
+      EndIf
+    Wend
+    If pol! = False
+      x = 0.5 * (xu + xo) : FUNKTION : VORZEICHEN
+      If Abs(y) < 10 ^ -8 Then y = 0             'Prüfung auf Nullstelle
+      ye = y : VIELFACHHEIT
+      If v = 1
+        Mul ye, -1
+        If j = 1
+          Print " Knickmaximum bei       x = "; x$; Round(x, 4)
+          Print "                        y = "; y$; Round(ye, 4)
+        Else
+          Print " "; j; "-wertiges Maximum bei x = "; x$; Round(x, 4)
+          Print "                        y = "; y$; Round(ye, 4)
+        EndIf
+      Else
+        If j = 1
+          Print " Knickminimum bei       x = "; x$; Round(x, 4)
+          Print "                        y = "; y$; Round(ye, 4)
+        Else
+          Print " "; j; "-wertiges Minimum bei x = "; x$; Round(x, 4)
+          Print "                        y = "; y$; Round(ye, 4)
+        EndIf
+      EndIf
+      Inc ex
+    EndIf
+    pol! = False : Add x, s : v = 0
+  Loop
+Return
+
+Sub VIELFACHHEIT
+  xk = x
+  Repeat
+    Add x, 0.005 : FUNKTION : VORZEICHEN
+  Until Abs(y - ye) >= 10 ^ -4
+  yj = y : xj = x : n = 1
+  ABLEITUNG : ab1 = ab : n = 2 : ABLEITUNG
+  j = Round(1 / (1 - ab * (yj - ye) / (ab1 * ab1)))
+  If j = 0 Then j = 1
+  If j > 2
+    x = xj - j * (yj - ye) / ab1 : w = 7 : n = 1
+    For z = 3 DownTo 1
+      Repeat
+        Add x, 0.001 : FUNKTION : VORZEICHEN
+      Until Abs(y - ye) >= 10 ^ -w
+      yj = y : xj = x : ABLEITUNG : xw(z) = xj - j * (yj - ye) / ab : Sub w, 3
+    Next z
+    di = xw(1) - xw(2) :  x = xw(1) - di * di / (di - xw(2) + xw(3))
+    If null! = False
+      FUNKTION : VORZEICHEN
+      ye = y
+    EndIf
+  Else
+    x = xk
+  EndIf
+Return
+
+Sub ABLEITUNG
+  dx = 10 ^ -(6 / n) : q = 0
+  For i = 0 To n
+    x = xj + dx * (n - 2 * i) : FUNKTION : VORZEICHEN
+    Add q, (-1) ^ i * y * Combin(n, i)
+  Next i
+  ab = q / (2 * dx) ^ n
+Return
+
+Sub VORZEICHEN
+  If null!
+    f = Abs(y)
+  Else If v = 1
+    y = -y
+  EndIf
+Return
+
+Sub FUNKTION            'In diese Subroutine y=f(x) eingeben!
+  Rem y = x ^ 7 + 4 * x ^ 6 - 54 * x ^ 5 - 160 * x ^ 4 + 641 * x ^ 3 + 828 * x ^ 2 - 1260 * x
+  Rem y=x^7+15*x^6-12*x^5-1186*x^4-5871*x^3-3045*x^2+26362*x+24696
+  Rem y = 1 / (x - 1) - 2 / (x - 2) ^ 3 - 3 / (x - 3) ^ 5 - 4 / (x - 4) ^ 7 - x * Exp(x) + 0.0168882882
+  Rem y = Abs(x ^ 6 - 18 * x ^ 5 + 120 * x ^ 4 - 346 * x ^ 3 + 315 * x ^ 2 + 300 * x - 500)
+  Rem y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = (x - 3) ^ 6 - 2
+  Rem y = Abs(x - 3) - 2
+  Rem y = (Cos(x - 3) - 1) ^ 3
+  Rem y=x+1/x+3
+  Rem y = Abs(x) ^ x - x ^ 3 + x ^ 2 - 1
+  Rem y = Abs(Tan(x) - x)
+  Rem y = 1 / x - 1
+  Rem y = x ^ 6
+  Rem y=x^3/(x^2-1)
+  Rem y=-2*(x+3)^10+4
+  Rem y=0.5*(x-4)^13-3
+  Rem y = Exp(-0.5 * (x - 1) ^ 2) - 0.5
+  Rem y=x^2*EXP(x)
+  Rem y=x^3*EXP(x)-0.5*x
+  Rem y=4/9*x*(x^2-9)*EXP(-x^2/6)
+  Rem y = (2 * x ^ 2 - 7 * x + 5) * Exp(x) - 9 * Exp(-0.5)
+  Rem y=EXP(x)*(2*x-x^2)
+  Rem y=1/x^6-3
+  Rem y=1/(x^2-2)^4-5
+  Rem y=1/(x-1)-x*EXP(x)
+  Rem y=x/2+2/(x-2)^2-4
+  Rem y=(x^3+x+2)/(4-x)
+  Rem y=(x^2-4*x+5)/(x+1)^3-2
+  Rem y = (x ^ 3 - x ^ 2 - 6 * x) / (x ^ 2 - 1) ^ 3
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x + 3) - 3
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) - 6
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) + 6
+  Rem y=2/(x+1)-4/(x^4-3)^2+2*x-14/9
+  Rem y=x^2/(1+0.1*x^3)-0.5*(x+1)
+  Rem y=(3*x^3-2*x^2-5*x)/(x^2-2*x-3)
+  Rem y = x ^ 2 * (x ^ 2 - 4 * x + 4) * (x ^ 3 + 1) / (2 * x + 4)
+  Rem y=(1-x^2)/(1+x^2)^2
+  Rem y = (x ^ 3 - 3 * x + 2) / (x ^ 2 - 4 * x + 5)
+  Rem y = (x - 4) / Sqr(x ^ 2 + 1)
+  Rem y = x * Tan(x)
+  Rem y = x * Atn(x) * Sin(x)
+  Rem y = (Cos(x - 3) - 1) ^ 4
+  Rem y = x * (Sin(x) + Cos(x)) - 3.595137
+  Rem y=SIN(x+SIN(x))
+  Rem y=COS((x^2/9))
+  Rem y=4*SIN(x/2-PI/3)-2*SIN(x/3)
+  Rem y = x * Log(Abs(x))
+  Rem y=x-LOG(x^2)-2
+  Rem y=LOG(SIN(x)+1)
+  Rem y = Abs(Abs(x - 1) - 2)
+  Rem y=0.5*ABS(x-5)^10-2
+  Rem y=1-ABS(SIN(0.5*x))
+  Rem y = Sqr(1 + Sin(x - PI / 3)) - 0.5
+  Rem y = Abs(x ^ 2 - 3) - 5
+  Rem y=ABS(x/(1+x^2))
+  Rem y=ABS(x*SIN(x))
+  Rem y = x ^ 2 - Sqr(Abs(x))
+  Rem y=ABS(0.6*x^2-0.2*x^3)
+  Rem y=ABS(0.1*x^3+3)-2
+  Rem y=SQR(ABS(x^2-1))
+  Rem y=(x-1.5)*ABS(x+4)
+  Rem y = (Abs(x + 2) - 3) * Abs(x + 3)
+  y = Abs(x ^ 2 * Abs(x - 1) - 1) - 1
+  Rem y=ABS(2*x^4-10*x^2-72)
+  Rem y = Abs(x) ^ x - x ^ 3 + x ^ 2 - 1
+  Rem y=2^(3*x-x^3)-1
+  Rem y=x^3*3^x
+  Rem y = x ^ 3 / 3 ^ x
+  Rem y = 1 / (x + 2) + 1 / (x + 1) + 1 / x + 1 / (x - 1) + 1 / (x - 2) + 1 / (x - 3) - 4
+Return

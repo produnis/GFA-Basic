@@ -1,0 +1,59 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double e, h, x, xa, xo, xu, y, ys : Global Int32 i, k, n, r, z : Global f$
+r = 32 : Dim s(r) As Double : e = 10 ^ -13
+Print
+Print "   Numerische Berechnung bestimmter Integrale von Funktionen y=f(x)"
+Print " mit einer 1-Knoten-Formel nach Gauß/Legendre, konvergenzbeschleunigt"
+Print " ********************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits in den Programmcode eingesetzt?"
+Input " Tippen Sie hier bitte ein 'j' für ja oder ein 'n' für nein ein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub INTEGRAND' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals ? ";xu
+'##E#
+Input " Obere  Grenze des Integrals ? ";xo
+Print : Print " Ergebnis:"
+
+k = 1 : n = 1 : h = xo - xu : GAUSS
+For k = 2 To r
+  Mul n, 2 : Div h, 2 : ys = 0 : GAUSS
+  z = 4
+  For i = k - 1 DownTo 1
+    s(i) = (s(i + 1) * z - s(i)) / (z - 1)
+    If Abs(s(i + 1) - s(i)) < e
+      Print " Integralwert = "; Round(s(i), 12)
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    Else If k = r
+      Print " Es konnte keine Lösung gefunden werden! Eine Erhöhung des Wertes"
+      Print " der Variablen e für die Fehlertoleranz ist eventuell zielführend."
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    Mul z, 4
+  Next i
+Next k
+
+Sub GAUSS
+  xa = xu - 0.5 * h
+  For i = 1 To n
+    x = xa + i * h : INTEGRAND
+    Add ys, y
+  Next i
+  s(k) = ys * h
+Return
+
+Sub INTEGRAND                           'In diese Subroutine y=f(x) eingeben!
+  Rem y = Exp(-x * x / 2) / Sqr(2 * PI)
+  Rem y = (2 ^ x - 4) / (x ^ 2 + 1)
+  y = 1 / x
+Return

@@ -1,0 +1,64 @@
+'##E#
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Int32 i, n : Global Double e, x, x1, x0, xe, xk, s, y, y0, y1 : Global a$
+Dim xn(100) As Double : s = 0.01013 : e = 10 ^ -12
+Print
+Print "   Berechnung der Einfachnullstellen (Schnittnullstellen) von Funktionen y=f(x)"
+Print "                              nach der Regula Falsi"
+Print "   ****************************************************************************"
+Print
+Print " Wurde die zu untersuchende Funktion y=f(x) bereits in den Programmcode eingegeben?"
+Input " Quittieren Sie diese Frage durch Eingabe eines 'j' für ja oder eines 'n' für nein! ", a$
+Print
+
+If a$ <> "j" And a$ <> "ja"
+  Print " Beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters und geben Sie"
+  Print " vor einem Neustart die zu untersuchende Funktion y=f(x) in das Unterprogramm"
+  Print " 'Sub FUNKTION' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+
+Input " Mit welchem Wert von x soll die Nullstellensuche starten? ", x
+Input " Bei welchem Wert von x soll die Nullstellensuche enden  ? ", xe
+Sub x, 0.00013 : n = 0
+
+Do
+  FUNKTION
+  Repeat
+    x0 = x : y0 = y : Add x, s
+    If x > xe + s
+      Print : Print " Ergebnis:"
+      If n = 0 : Print " Keine Nullstelle gefunden!"
+      Else If n = 1 : Print " Eine Nullstelle ist bei"
+        Print " x = "; Round(xn(1), 8)
+      Else : Print " Nullstellen sind bei"
+        For i = 1 To n
+          Print " x = "; Round(xn(i), 8)
+        Next i
+      EndIf
+      Print : Print " ENDE   Durch Schließen dieses Fensters wird die Anwendung beendet!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    FUNKTION
+  Until Sgn(y) <> Sgn(y0)
+  xk = x : x1 = x : y1 = y : Sub x, s / 2 : FUNKTION
+  If Sgn(y) = Sgn(y1) And Abs(y) < Abs(y1) Or Sgn(y) = Sgn(y0) And Abs(y) < Abs(y0)
+    Repeat
+      x = x0 - y0 * (x1 - x0) / (y1 - y0) : FUNKTION
+      If Sgn(y) = Sgn(y0) : x0 = x : y0 = y
+      Else : x1 = x : y1 = y
+      EndIf
+    Until Abs(y) < e
+    Inc n : xn(n) = x : Add x, s
+  Else : x = xk + s
+  EndIf
+Loop
+
+Sub FUNKTION                          'In diese Subroutine y=f(x) eingeben!
+  Rem y = x ^ 4 - 10 * x ^ 3 + 35 * x ^ 2 - 50 * x + 24
+  Rem y = Exp(2 * x - 2) - x * (x + 1) + 0.5
+  Rem y=1/x-1
+  y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) + 6
+  Rem y = 2 / (x - 1) / (x - 2) / (x - 3) / (x - 4) - 6
+Return

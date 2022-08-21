@@ -1,0 +1,80 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double a, a0, a1, b, b0, d : Global Int64 m, n, q, r
+Global a1$, d$, f$, l$, p$, r$, t$, v$
+Print
+Print "         Umwandlung periodischer und nichtperiodischer Dezimalbrüche"
+Print "                        in gewöhnliche (echte) Brüche"
+Print "         ***********************************************************"
+Print
+Print " Ist der umzuwandelnde Dezimalbruch periodisch oder nichtperiodisch? Bitte geben"
+Print " Sie nachfolgend den Buchstaben p für periodisch oder die Buchstabenfolge np für"
+Print " nichtperiodisch ein!"
+Input " Hier bitte p oder np eingeben ", f$
+Print
+If f$ <> "p" And f$ <> "np"
+  Print " Achtung: Die Eingaben zum Typ des umzuwandelnden Dezimalbruchs sind ungültig!"
+  Print " Schließen Sie jetzt dieses Fenster und starten Sie das Programm erneut!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+Else If f$ = "p"
+  Print " Wie lautet der periodische Dezimalbruch bis zum Ende der ersten Periode?"
+  Print " Einzugeben ist dafür ein Wert d>0 und <1 !"
+  Input " d = ", d
+  While d <= 0 Or d >= 1
+    Print
+    If d <= 0 Then Print " Achtung: Der eingegebene Wert für d ist zu klein!"
+    If d >= 1 Then Print " Achtung: Der eingegebene Wert für d ist zu groß!"
+    Print " Bitte geben Sie d erneut und korrekt ein!"
+    Input " d = ", d
+  Wend
+  d$ = Str$(d) : q = Len(d$) - 2
+  Print
+  Print " Aus wie vielen Stellen n besteht eine vollständige Periode des Dezimalbruchs?"
+  Print " Beachten Sie bitte bei der Eingabe, dass n>0 und ganzzahlig sein muss, im"
+  Print " vorliegenden Fall aber nicht >"; q; " sein darf!"
+  Input " n = ";n
+  While n <= 0 Or n > q
+    If n <= 0 Then Print " Achtung: Die eingegebene Stellenanzahl n ist zu klein!"
+    If n > q Then Print " Achtung: Die eingegebene Stellenanzahl n ist zu groß!"
+    Print " Bitte geben Sie n erneut und korrekt ein!"
+    Input " n = ";n
+  Wend
+  p$ = Right$(d$, n) : r = q - n : t$ = String$(n, Chr$(57))
+  If r = 0
+    a0 = Val(p$ + "." + p$) - d : m = 0
+  Else
+    r$ = "." + Right$(d$, r)
+    l$ = Mid$(d$, 3, n)
+    a1 = Val(l$ + r$ + p$) - d
+    a1$ = Str$(a1)
+    v$ = Str$(Trunc(a1))             'alternativ: v$=STR$(INT(a1))
+    m = Len(a1$) - Len(v$) - 1
+    a0 = Val(v$ + Right$(a1$, m))
+  EndIf
+Else
+  Print " Wie lautet der umzuwandelnde nichtperiodische Dezimalbruch?"
+  Print " Einzugeben ist dafür ein Wert d >0 und <1 !"
+  Input " d = ", d
+  While d <= 0 Or d >= 1 : Print
+    If d <= 0 Then Print " Achtung: Der eingegebene Wert für d ist zu klein!"
+    If d >= 1 Then Print " Achtung: Der eingegebene Wert für d ist zu groß!"
+    Print " Bitte geben Sie d erneut und korrekt ein!"
+    Input " d = ", d
+  Wend
+  d$ = Str$(d) : m = Len(d$) - 2
+  a0 = Val(Right$(d$, m)) : t$ = "1"
+EndIf
+b0 = Val(t$ + String$(m, Chr$(48)))
+a = a0 : b = b0
+While b
+  Sub a, b * Int(a / b)
+  Exit If a = 0
+  Sub b, a * Int(b / a)
+Wend
+Print
+Print " Ergebnis der Umrechnung:"
+Print " Zähler = "; a0 / (a + b)
+Print " Nenner = "; b0 / (a + b)
+Print
+Print " ENDE   Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End

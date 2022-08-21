@@ -1,0 +1,60 @@
+'##E#
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double a, b, dx, dy, e, h, h0, x, xo, xu, y, yo, yu : Global Int32 i, k, n, r, z
+Global f$ : e = 10 ^ -11 : dx = 10 ^ -9 : r = 32 : Dim s(r) As Double
+Print
+Print "            Numerische Berechnung bestimmter Integrale von Funktionen y=f(x)"
+Print "         mit der Hermiteformel, konvergenzbeschleunigt nach der Romberg-Methode"
+Print " (Ableitungen an den Intervallgrenzen werden als innere Differenzenquotienten berechnet)"
+Print " ***************************************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits in den Programmcode eingesetzt?"
+Input " Tippen Sie hier bitte ein 'j' für ja oder ein 'n' für nein ein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Bitte beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub INTEGRAND' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals ? ";xu
+Input " Obere  Grenze des Integrals ? ";xo
+Print
+Print " Ergebnis:"
+
+h0 = xo - xu : x = xu : INTEGRAND
+yu = y : Add x, dx : INTEGRAND
+dy = y - yu : x = xo : INTEGRAND
+yo = y : a = (yu + yo) / 2 : Sub x, dx : INTEGRAND
+b = (dy - yo + y) / (12 * dx) : s(1) = h0 * (a + b * h0)
+For k = 2 To r
+  n = 2 ^ (k - 2) : h = h0 / (2 * n)
+  For i = 1 To n
+    x = xu + h * (2 * i - 1) : INTEGRAND
+    Add a, y
+  Next i
+  s(k) = h * (a + b * h)
+  z = 16
+  For i = k - 1 DownTo 1                         'Romberg-Extrapolation
+    s(i) = (s(i + 1) * z - s(i)) / (z - 1)
+    If Abs(s(i + 1) - s(i)) < e
+      Print " Integralwert = "; Round(s(i), 10)
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    Else If k = r
+      Print " Es konnte keine Lösung gefunden werden! Eine Erhöhung des Wertes"
+      Print " der Variablen e für die Fehlertoleranz ist eventuell zielführend."
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    Mul z, 4
+  Next i
+Next k
+
+Sub INTEGRAND                        'In diese Subroutine y=f(x) eingeben!
+  y = Exp(-x * x / 2) / Sqr(2 * PI)
+  Rem y = 1 / x
+Return

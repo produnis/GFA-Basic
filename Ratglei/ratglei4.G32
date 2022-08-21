@@ -1,0 +1,221 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double b3, b4, c3, c4, d3, d4, e4, f, fa, g, h, im, k, p, ph, q, r, r1
+Global Double s, u, v, x, x1, x2, x3, y, y1, y2 : Dim ke(2), kn(2) As Double
+Global  i, j, n, t , m!, a$, b$, c$
+Print
+Print " Lösung ganzrationaler Gleichungen bis vierten Grades mit expliziten Formeln"
+Print " ***************************************************************************"
+Print
+Print " Von welchem Grad 1<=n<=4 ist die zu lösende Gleichung?"
+Input " n = ? ";n
+While n < 1 Or n > 4
+  Print " Eingabefehler! Der Gleichungsgrad 'n' muß ganzzahlig >=1 und <=4 sein."
+  Input " n = ? ";n
+Wend
+Dim a(n) As Double
+Print
+Print " Achtung! Das Programm erwartet die Gleichungsform:"
+a$ = "a4*x^4+a3*x^3+a2*x^2+a1*x+a0 = 0"
+Print " " + Right$(a$, Len(a$) - Mul(7, Sub(4, n)))
+Print
+b$ = "a4,a3,a2,a1 und a0 ein!"
+c$ = Right$(b$, Len(b$) - Mul(3, Sub(4, n)))
+Print " Bitte geben Sie gemäß Aufruf die Werte der Faktoren " + c$
+For i = n DownTo 0
+  Print " a"; i; " = "
+  Locate 6, CrsLin - 1
+  Input a(i)
+Next i
+Print
+Select n                 'Alternativ mit IF-Else-Abfrage
+Case 1 : eins
+Case 2 : zwei
+Case 3 : drei
+Case 4 : vier
+EndSelect
+Print
+Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+Sub eins
+  Print " Die Lösung ist"
+  Print " x = "; Round(-a(0) / a(1), 8)
+Return
+Sub zwei
+  Print " Die Lösungen sind:"
+  h = a(1) / (2 * a(2))
+  k = h ^ 2 - a(0) / a(2)
+  If k >= 0
+    Print " x1 = "; Round(Sqr(k) - h, 8)
+    Print " x2 = "; Round(-Sqr(k) - h, 8)
+  Else
+    Print " x1 = "; Round(-h, 8); " +i*"; Round(Sqr(-k), 8)
+    Print " x2 = "; Round(-h, 8); " -i*"; Round(Sqr(-k), 8)
+  EndIf
+Return
+Sub drei
+  Print " Die Lösungen sind:"
+  b3 = a(2) / a(3)
+  c3 = a(1) / a(3)
+  d3 = a(0) / a(3)
+  cube
+  If r = 0
+    x1 = -u - b3 / 3
+    Print " x1 = "; Round(y, 8)
+    Print " x2 = "; Round(x1, 8)
+    Print " x3 = "; Round(x1, 8)
+  Else If r > 0
+    x2 = -(u + v) / 2 - b3 / 3
+    x3 = Sqr(3) * (u - v) / 2
+    Print " x1 = "; Round(y, 8)
+    Print " x2 = "; Round(x2, 8); " +i*"; Round(x3, 8)
+    Print " x3 = "; Round(x2, 8); " -i*"; Round(x3, 8)
+  Else
+    Print " x1 = "; Round(y, 8)
+    Print " x2 = "; Round(-2 * Sqr(-p) * Cos((ph + PI) / 3) - b3 / 3, 8)
+    Print " x3 = "; Round(-2 * Sqr(-p) * Cos((ph - PI) / 3) - b3 / 3, 8)
+  EndIf
+Return
+Sub vier
+  Print " Die Lösungen sind:"
+'##E#
+  zweitest
+  If m! = True
+    Print " x1 = "; x
+    Print " x2 = "; x
+    polydiv
+    h = ke(1) / (2 * ke(2))
+    k =  h ^ 2 - ke(0) / ke(2)
+    If k >= 0
+      Print " x3 = "; Round(Sqr(k) - h, 8)
+      Print " x4 = "; Round(-Sqr(k) - h, 8)
+    Else
+      Print " x3 = "; Round(-h, 8); " +i*"; Round(Sqr(-k), 8)
+      Print " x4 = "; Round(-h, 8); " -i*"; Round(Sqr(-k), 8)
+    EndIf
+  Else
+    t = 1
+    b4 = a(3) / a(4)
+    c4 = a(2) / a(4)
+    d4 = a(1) / a(4)
+    e4 = a(0) / a(4)
+    If b4 * (4 * c4 - b4 ^ 2) - 8 * d4 == 0
+      m = -b4 / 4
+      Sub c4, 6 * m ^ 2
+      Sub e4, m ^ 2 * (m ^ 2 + c4)
+      biquad
+    Else
+      b3 = -c4 / 2
+      c3 = b4 * d4 / 4 - e4
+      d3 = (e4 * (4 * c4 - b4 ^ 2) - d4 ^ 2) / 8
+      cube
+      g = 2 * Sqr(8 * y + b4 ^ 2 - 4 * c4)
+      quad
+      g = -g
+      quad
+    EndIf
+  EndIf
+  Rem Erase ke(), kn()
+Return
+Sub cube
+  p = (3 * c3 - b3 ^ 2) / 9
+  q = b3 * (b3 ^ 2 / 27 - c3 / 6) + d3 / 2
+  r = q ^ 2 + p ^ 3
+  If Abs(p) < 10 ^ -12 Then p = 0
+  If Abs(q) < 10 ^ -12 Then q = 0
+  If Abs(r) < 10 ^ -12
+    r = 0
+    u = Sgn(-q) * Abs(q) ^ (1 / 3)
+    y = 2 * u - b3 / 3
+  Else If r > 0
+    u = Sqr(r) - q
+    u = Sgn(u) * Abs(u) ^ (1 / 3)
+    v = -Sqr(r) - q
+    v = Sgn(v) * Abs(v) ^ (1 / 3)
+    y = u + v - b3 / 3
+  Else
+    ph = Acos(-q / Sqr(-p ^ 3))
+    y = 2 * Sqr(-p) * Cos(ph / 3) - b3 / 3
+  EndIf
+Return
+Sub quad
+  h = g * (2 * b4 + g) / 8
+  k = h * (h - 8 * y) + 2 * d4 * g
+  If Abs(k) < 10 ^ -14 Then k = 0
+  If k >= 0
+    Print " x"; t; " = "; Round((Sqr(k) - h) / g, 8)
+    Inc t
+    Print " x"; t; " = "; Round(-(Sqr(k) + h) / g, 8)
+    Inc t
+  Else
+    Print " x"; t; " = "; Round(-h / g, 8); " +i*"; Round(Sqr(-k) / Abs(g), 8)
+    Inc t
+    Print " x"; t; " = "; Round(-h / g, 8); " -i*"; Round(Sqr(-k) / Abs(g), 8)
+    Inc t
+  EndIf
+Return
+Sub biquad
+  s = c4 ^ 2 - 4 * e4
+  If s >= 0
+    y1 = (Sqr(s) - c4) / 2 : y2 = -y1 - c4
+    If y1 >= 0
+      Print " x"; t; " = "; Round(m + Sqr(y1), 8)
+      Inc t
+      Print " x"; t; " = "; Round(m - Sqr(y1), 8)
+      Inc t
+    Else
+      Print " x"; t; " = "; Round(m, 8); " +i*"; Round(Sqr(-y1), 8)
+      Inc t
+      Print " x"; t; " = "; Round(m, 8); " -i*"; Round(Sqr(-y1), 8)
+      Inc t
+    EndIf
+    If y2 >= 0
+      Print " x"; t; " = "; Round(m + Sqr(y2), 8)
+      Inc t
+      Print " x"; t; " = "; Round(m - Sqr(y2), 8)
+      Inc t
+    Else
+      Print " x"; t; " = "; Round(m, 8); " +i*"; Round(Sqr(-y2), 8)
+      Inc t
+      Print " x"; t; " = "; Round(m, 8); " -i*"; Round(Sqr(-y2), 8)
+      Inc t
+    EndIf
+  Else
+    r1 = Sqr(2 * Sqr(e4) - c4) / 2
+    im = Round(Sqr(4 * e4 - c4 * c4) / (4 * r1), 8)
+    Print " x1 = "; Round(m - r1, 8); " +i*"; im
+    Print " x2 = "; Round(m - r1, 8); " -i*"; im
+    Print " x3 = "; Round(m + r1, 8); " +i*"; im
+    Print " x4 = "; Round(m + r1, 8); " -i*"; im
+  EndIf
+Return
+Sub zweitest
+  m! = False
+  h = a(3) / (4 * a(4))
+  k = h ^ 2 - a(2) / (6 * a(4))
+  If k >= 0
+    x = Sqr(k) - h
+    nulltest
+    If m! = False Then x = -Sqr(k) - h : nulltest
+  EndIf
+Return
+Sub nulltest
+  f = a(4)
+  fa = 0
+  For i = 3 DownTo 0
+    fa = f + x * fa
+    f = a(i) + x * f
+  Next i
+  If Abs(f) < 10 ^ -10 And Abs(fa) < 10 ^ -10 Then m! = True
+Return
+Sub polydiv
+  kn(2) = 1
+  kn(1) = -2 * x
+  kn(0) = x ^ 2
+  For i = 2 DownTo 0
+    ke(i) = a(i + 2)
+    For j = i + 2 DownTo i
+      Sub a(j), ke(i) * kn(j - i)
+    Next j
+  Next i
+Return

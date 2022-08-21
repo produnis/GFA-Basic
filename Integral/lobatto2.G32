@@ -1,0 +1,67 @@
+FullW # 1
+Mode StrSpace 0 : AutoRedraw = 1 : BackColor = colBtnFace : FontName = "fixedsys"
+Global Double a, b, e, h, x, xo, xu, y, y0, y1, y2 : Global Int32 i, k, n, r, z
+Global f$ : e = 10 ^ -12 : r = 32 : Dim s(r) As Double
+Print
+Print "    Numerische Berechnung bestimmter Integrale von Funktionen y=f(x)"
+Print "  mit einer 4-Stützstellen-Formel nach Lobatto, konvergenzbeschleunigt"
+Print "  ********************************************************************"
+Print
+Print " Wurde der Integrand y=f(x) bereits in den Programmcode eingesetzt?"
+Input " Tippen Sie hier bitte ein 'j' für ja oder ein 'n' für nein ein! ";f$
+Print
+If f$ <> "j" And f$ <> "ja"
+  Print " Bitte beenden Sie den Programmablauf jetzt durch Schließen dieses Fensters"
+  Print " und geben Sie vor einem Neustart die zu integrierende Funktion y=f(x)"
+  Print " in das Unterprogramm 'Sub INTEGRAND' ein!"
+  Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+EndIf
+Input " Untere Grenze des Integrals ? ";xu
+'##E#
+Input " Obere  Grenze des Integrals ? ";xo
+Print
+Print " Ergebnis:"
+
+n = 1 : a = 1 / Sqr(5) : b = 0.5 * (1 - a) : h = xo - xu
+x = xu : INTEGRAND
+y0 = y : x = xo : INTEGRAND
+Add y0, y : x = xu + h * b : INTEGRAND
+Add y2, y : Add x, h * a : INTEGRAND
+Add y2, y
+s(1) = h * (y0 + 5 * y2) / 12
+For k = 2 To r
+  Mul h, 0.5 : y2 = 0
+  For i = 1 To n
+    x = xu + h * (2 * i - 1) : INTEGRAND
+    Add y1, y
+  Next i
+  Mul n, 2
+  For i = 1 To n
+    x = xu + h * (i - b) : INTEGRAND
+    Add y2, y : Sub x, h * a : INTEGRAND
+    Add y2, y
+  Next i
+  s(k) = h * (y0 + 2 * y1 + 5 * y2) / 12         'Lobatto-Formel
+  z = 64
+  For i = k - 1 DownTo 1                         'Extrapolation
+    s(i) = (s(i + 1) * z - s(i)) / (z - 1)
+    If Abs(s(i + 1) - s(i)) < e
+      Print " Integralwert = "; Round(s(i), 12)
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    Else If k = r
+      Print " Es konnte keine Lösung gefunden werden! Eine Erhöhung des Wertes"
+      Print " der Variablen e für die Fehlertoleranz ist eventuell zielführend."
+      Print
+      Print " ENDE  Durch Schließen dieses Fensters beenden Sie die Anwendung!"
+      Do : Sleep : Until Me Is Nothing : CloseW # 1 : End
+    EndIf
+    Mul z, 4
+  Next i
+Next k
+
+Sub INTEGRAND                          'In diese Subroutine y=f(x) eingeben!
+  y = Exp(-x * x / 2) / Sqr(2 * PI)
+  Rem y = 1 / x
+Return
