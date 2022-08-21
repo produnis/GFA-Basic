@@ -6,3 +6,6 @@ While `GFA-Basic` is now outdated, the programmed functions are still elegant an
 
 
 All Credits go to our Grandpa **Josef Wienand** from Werdohl, Germany.
+
+
+PS: You might a get a working copy of GFA-Basic-32 for Windows here: http://gfabasic32.blogspot.com/p/download.html
